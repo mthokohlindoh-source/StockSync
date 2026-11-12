@@ -20,12 +20,21 @@ button { width: 100%; padding: 12px; margin-top: 12px; background: black; color:
 <option>Viewer</option>
 </select>
 
-<button>Login</button>
+<button onclick="goToDashboard()">Login</button>
 <p>Admin can do everything. Viewer can only view.</p>
 </div>
 <script>
 if (!navigator.onLine) {
   document.querySelector('.badge').textContent = '● OFFLINE';
   document.querySelector('.badge').style.background = '#ff0000';
+}
+function goToDashboard() {
+  let name = document.querySelector('input').value;
+  if (!name) {
+    alert('Please enter your name first!');
+    return;
+  }
+  localStorage.setItem('userName', name);
+  window.location.href = 'dashboard.html';
 }
 </script>
