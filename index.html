@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockSync - Login</title>
 <style>
   body { background: #f1f5f9; text-align: center; padding: 40px 16px; font-family: Arial; margin: 0; }
   .box { background: white; width: 100%; max-width: 380px; margin: auto; padding: 24px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); box-sizing: border-box; }
@@ -8,42 +14,37 @@
   button:active { transform: scale(0.98); }
   .badge { background: #16a34a; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; }
   @media (max-width: 480px) { .box { padding: 20px 16px; } }
-  </style>
-  
-  <div class="box">
+</style>
+</head>
+<body>
+<div class="box">
   <span class="badge" id="statusBadge">● ONLINE</span>
   <h2>StockSync Login</h2>
   <p>Choose your role to test</p>
-  
   <input id="nameInput" placeholder="Enter your name">
-  <select id="roleSelect">
-  <option>Admin</option>
-  <option>Staff</option>
-  <option>Viewer</option>
-  </select>
-  
+  <select id="roleSelect"><option>Admin</option><option>Staff</option><option>Viewer</option></select>
   <button id="loginBtn">Login</button>
-  <p>Admin can do everything. Viewer can only view.</p>
-  </div>
-  
-  <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const badge = document.getElementById('statusBadge');
-    if (!navigator.onLine) {
-      badge.textContent = '● OFFLINE';
-      badge.style.background = '#ef4444';
-    }
-  
-    document.getElementById('loginBtn').addEventListener('click', function() {
-      let name = document.getElementById('nameInput').value.trim();
-      let role = document.getElementById('roleSelect').value;
-      if (!name) {
-        alert('Please enter your name first!');
-        return;
-      }
-      localStorage.setItem('userName', name);
-      localStorage.setItem('userRole', role);
-      window.location.href = 'dashboard.html';
-    });
-  });
-  </script>
+  <p>Admin & Staff can add products.<br>Viewer can only view.</p>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const badge = document.getElementById('statusBadge');
+  if (!navigator.onLine) { badge.textContent = '● OFFLINE'; badge.style.background = '#ef4444'; }
+  window.addEventListener('online', ()=>{ badge.textContent='● ONLINE'; badge.style.background='#16a34a'; });
+  window.addEventListener('offline', ()=>{ badge.textContent='● OFFLINE'; badge.style.background='#ef4444'; });
+  let lastName = localStorage.getItem('userName');
+  if(lastName) document.getElementById('nameInput').value = lastName;
+  function doLogin(){
+    let name = document.getElementById('nameInput').value.trim();
+    let role = document.getElementById('roleSelect').value;
+    if (!name) { alert('Please enter your name first!'); return; }
+    localStorage.setItem('userName', name);
+    localStorage.setItem('userRole', role);
+    window.location.href = 'dashboard.html';
+  }
+  document.getElementById('loginBtn').addEventListener('click', doLogin);
+  document.getElementById('nameInput').addEventListener('keypress', function(e){ if(e.key==='Enter') doLogin(); });
+});
+</script>
+</body>
+</html>
