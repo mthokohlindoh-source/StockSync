@@ -4,47 +4,44 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StockSync - Login</title>
-<style>
-  body { background: #f1f5f9; text-align: center; padding: 40px 16px; font-family: Arial; margin: 0; }
-  .box { background: white; width: 100%; max-width: 380px; margin: auto; padding: 24px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); box-sizing: border-box; }
-  h2 { margin: 8px 0 0 0; }
-  p { color: #64748b; font-size: 14px; }
-  input, select { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 15px; }
-  button { width: 100%; padding: 13px; margin-top: 14px; background: #0f172a; color: white; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; }
-  button:active { transform: scale(0.98); }
-  .badge { background: #16a34a; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; }
-  @media (max-width: 480px) { .box { padding: 20px 16px; } }
-</style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<div class="box">
-  <span class="badge" id="statusBadge">● ONLINE</span>
-  <h2>StockSync Login</h2>
-  <p>Choose your role to test</p>
-  <input id="nameInput" placeholder="Enter your name">
-  <select id="roleSelect"><option>Admin</option><option>Staff</option><option>Viewer</option></select>
-  <button id="loginBtn">Login</button>
-  <p>Admin & Staff can add products.<br>Viewer can only view.</p>
+<body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
+<div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
+  <div class="text-center mb-6">
+    <div class="text-5xl">📦</div>
+    <h1 class="text-3xl font-black mt-2">StockSync</h1>
+    <p class="text-slate-500 text-sm">Manage your stock. Anywhere.</p>
+  </div>
+  <label class="text-sm font-bold">Your Name</label>
+  <input id="name" type="text" placeholder="e.g. Thabo" class="w-full border rounded-xl p-3 mt-1 mb-4 outline-none focus:border-blue-500">
+  <label class="text-sm font-bold">Role</label>
+  <select id="role" class="w-full border rounded-xl p-3 mt-1 mb-4">
+    <option value="Admin">Admin - Can Add / Edit / Delete</option>
+    <option value="Viewer">Viewer - View Only</option>
+  </select>
+  <label class="text-sm font-bold">Admin Password <span class="font-normal text-slate-400">(Only for Admin)</span></label>
+  <input id="password" type="password" placeholder="Admin password" class="w-full border rounded-xl p-3 mt-1 mb-4 outline-none focus:border-blue-500">
+  <button onclick="login()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700">Login →</button>
+  <p id="error" class="text-red-500 text-sm text-center mt-3 hidden"></p>
+  <p class="text-center text-xs text-slate-400 mt-4">Admin password: <b>admin123</b> — change it later</p>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const badge = document.getElementById('statusBadge');
-  if (!navigator.onLine) { badge.textContent = '● OFFLINE'; badge.style.background = '#ef4444'; }
-  window.addEventListener('online', ()=>{ badge.textContent='● ONLINE'; badge.style.background='#16a34a'; });
-  window.addEventListener('offline', ()=>{ badge.textContent='● OFFLINE'; badge.style.background='#ef4444'; });
-  let lastName = localStorage.getItem('userName');
-  if(lastName) document.getElementById('nameInput').value = lastName;
-  function doLogin(){
-    let name = document.getElementById('nameInput').value.trim();
-    let role = document.getElementById('roleSelect').value;
-    if (!name) { alert('Please enter your name first!'); return; }
-    localStorage.setItem('userName', name);
-    localStorage.setItem('userRole', role);
-    window.location.href = 'dashboard.html';
+function login(){
+  const name = document.getElementById('name').value.trim();
+  const role = document.getElementById('role').value;
+  const pass = document.getElementById('password').value;
+  const err = document.getElementById('error');
+  if(!name){ err.textContent="Please enter your name"; err.classList.remove('hidden'); return; }
+  if(role==="Admin" && pass!=="admin123"){
+    err.textContent="Wrong Admin password!"; err.classList.remove('hidden'); return;
   }
-  document.getElementById('loginBtn').addEventListener('click', doLogin);
-  document.getElementById('nameInput').addEventListener('keypress', function(e){ if(e.key==='Enter') doLogin(); });
-});
+  const user = { name, role, loginTime: Date.now() };
+  sessionStorage.setItem('stocksync_user', JSON.stringify(user));
+  window.location.replace('dashboard.html');
+}
 </script>
 </body>
 </html>

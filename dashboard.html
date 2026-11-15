@@ -4,211 +4,94 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StockSync - Dashboard</title>
-<style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
-  body { background:#f1f5f9; display:flex; }
-  .sidebar { width:220px; background:#0f172a; color:white; height:100vh; padding:25px 20px; position:fixed; left:0; top:0; z-index:100; transition:transform 0.3s; }
-  .sidebar h2 { color:#38bdf8; margin-bottom:30px; }
-  .sidebar a { display:block; color:#cbd5e1; text-decoration:none; padding:12px 10px; border-radius:8px; margin-bottom:5px; cursor:pointer; }
-  .sidebar a.active, .sidebar a:hover { background:#1e293b; color:white; }
-  .main { margin-left:220px; padding:30px; width:100%; }
-  .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; gap:12px; flex-wrap:wrap; }
-  .top h1 { font-size:26px; color:#0f172a; }
-  .top p { color:#64748b; }
-  .cards { display:flex; gap:20px; margin-bottom:25px; flex-wrap:wrap; }
-  .card { background:white; padding:20px; border-radius:12px; flex:1; min-width:160px; box-shadow:0 4px 14px rgba(0,0,0,0.06); cursor:pointer; }
-  .card p { color:#64748b; font-size:14px; }
-  .card h3 { font-size:28px; margin-top:8px; }
-  .blue{border-top:4px solid #38bdf8;} .green{border-top:4px solid #22c55e;} .red{border-top:4px solid #ef4444;} .orange{border-top:4px solid #f97316;}
-  .box { background:white; padding:20px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.06); overflow-x:auto; margin-bottom:20px; }
-  table { width:100%; border-collapse:collapse; margin-top:15px; min-width:480px; }
-  th,td { text-align:left; padding:12px; border-bottom:1px solid #e2e8f0; }
-  th { color:#64748b; font-size:13px; }
-  .low{color:#ef4444; font-weight:bold;} .ok{color:#22c55e; font-weight:bold;}
-  button { background:#0f172a; color:white; border:none; padding:10px 18px; border-radius:8px; cursor:pointer; }
-  .smallBtn{padding:6px 10px; font-size:13px; margin-right:5px;} .delBtn{background:#ef4444;} .sellBtn{background:#22c55e;}
-  input,select { width:100%; padding:12px; margin:8px 0; border-radius:8px; border:1px solid #cbd5e1; }
-  .menu-btn{display:none;}
-  .modal{display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999; align-items:center; justify-content:center; padding:15px;}
-  .modalContent{background:white; padding:20px; border-radius:15px; width:100%; max-width:400px;}
-  @media(max-width:768px){
-    .sidebar{transform:translateX(-100%);} .sidebar.open{transform:translateX(0);}
-    .main{margin-left:0; padding:16px;} .menu-btn{display:block;} .cards{flex-direction:column;} .card{min-width:100%;}
-  }
-</style>
-</head>
-<body>
-<div class="sidebar" id="sidebar">
-  <h2>📦 StockSync</h2>
-  <a id="dashboardLink" class="active">🏠 Dashboard</a>
-  <a id="productsLink">📦 Products</a>
-  <a id="lowStockLink">📉 Low Stock</a>
-  <a id="salesLink">💰 Sales</a>
-  <a id="settingsLink">⚙️ Settings</a>
-  <a id="logoutBtn">🚪 Logout</a>
-</div>
-<div class="main">
-  <div class="top">
-    <div>
-      <button class="menu-btn" id="menuBtn">☰</button>
-      <h1 id="welcomeText">Welcome back! 👋</h1>
-      <p id="roleText">Here's what's happening today.</p>
-    </div>
-    <button id="addProductBtn">+ Add Product</button>
-  </div>
-  <div class="cards">
-    <div class="card blue" id="cardTotal"><p>Total Products</p><h3 id="totalCount">0</h3></div>
-    <div class="card green" id="cardSales"><p>Today's Sales</p><h3 id="salesTotal">R 0</h3></div>
-    <div class="card red" id="cardLow"><p>Low Stock</p><h3 id="lowCount">0 Items</h3></div>
-    <div class="card orange"><p>Total Stock Value</p><h3 id="stockValue">R 0</h3></div>
-  </div>
-  <div class="box">
-    <h3 id="tableTitle">Low Stock Alert</h3>
-    <p id="tableHint" style="color:#64748b; font-size:13px; margin-top:5px;">Products with 5 or less left</p>
-    <table>
-      <thead><tr><th>Product</th><th>Category</th><th>Left</th><th>Price</th><th>Status</th><th>Action</th></tr></thead>
-      <tbody id="productTable"></tbody>
-    </table>
-    <p id="emptyMsg" style="padding:15px 0; color:#64748b; display:none;">No products here yet. Click + Add Product!</p>
-  </div>
-</div>
-<div class="modal" id="addModal">
-  <div class="modalContent">
-    <h3>➕ Add New Product</h3>
-    <input id="newName" placeholder="Product Name e.g. Coca-Cola">
-    <input id="newCategory" placeholder="Category e.g. Drinks">
-    <input id="newQty" type="number" placeholder="Quantity e.g. 10">
-    <input id="newPrice" type="number" placeholder="Price e.g. 25">
-    <button onclick="saveProduct()" style="width:100%; background:#22c55e; margin-top:10px;">Save Product</button>
-    <button onclick="closeModal()" style="width:100%; background:#64748b; margin-top:8px;">Cancel</button>
-  </div>
-</div>
-<div class="modal" id="settingsModal">
-  <div class="modalContent">
-    <h3>⚙️ Settings</h3>
-    <label>Your Name</label><input id="settingName">
-    <label>Role</label><select id="settingRole"><option>Admin</option><option>Staff</option><option>Viewer</option></select>
-    <button onclick="saveSettings()" style="width:100%; background:#22c55e; margin-top:10px;">Save Settings</button>
-    <button onclick="clearAllData()" style="width:100%; background:#ef4444; margin-top:8px;">Clear All My Added Products</button>
-    <button onclick="closeSettings()" style="width:100%; background:#64748b; margin-top:8px;">Close</button>
-  </div>
-</div>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+<script src="https://cdn.tailwindcss.com"></script>
 <script>
-let currentView = 'dashboard';
-let defaultProducts = [
-  {name:'Coca-Cola 500ml', category:'Drinks', qty:3, price:25},
-  {name:'Bread - White', category:'Bakery', qty:5, price:18},
-  {name:'Milk 2L', category:'Dairy', qty:2, price:42},
-  {name:'Sugar 1kg', category:'Groceries', qty:18, price:30},
-];
-function getProducts(){
-  let saved = JSON.parse(localStorage.getItem('stocksync_products') || 'null');
-  if(!saved) { localStorage.setItem('stocksync_products', JSON.stringify(defaultProducts)); return defaultProducts; }
-  return saved;
+// SECURITY: Block direct access + Block back button after logout
+const saved = sessionStorage.getItem('stocksync_user');
+if(!saved){ window.location.replace('index.html'); }
+const user = saved ? JSON.parse(saved) : null;
+// Auto logout after 30 mins
+if(user && Date.now() - user.loginTime > 30*60*1000){ sessionStorage.removeItem('stocksync_user'); window.location.replace('index.html'); }
+history.pushState(null, null, location.href);
+window.onpopstate = function(){ history.pushState(null, null, location.href); };
+</script>
+</head>
+<body class="bg-slate-100 min-h-screen">
+<header class="bg-slate-900 text-white p-4 flex justify-between items-center sticky top-0 z-10">
+  <div><h1 class="font-black text-xl">📦 StockSync</h1><p id="welcome" class="text-xs text-slate-300"></p></div>
+  <button onclick="logout()" class="bg-red-500 px-4 py-2 rounded-lg font-bold text-sm">Logout</button>
+</header>
+
+<main class="p-4 max-w-3xl mx-auto pb-24">
+  <div class="grid grid-cols-3 gap-3 mb-4">
+    <div class="bg-white p-3 rounded-xl text-center"><p class="text-xs text-slate-500">Total Items</p><p id="totalItems" class="text-2xl font-black">0</p></div>
+    <div class="bg-white p-3 rounded-xl text-center"><p class="text-xs text-slate-500">Total Qty</p><p id="totalQty" class="text-2xl font-black">0</p></div>
+    <div class="bg-white p-3 rounded-xl text-center"><p class="text-xs text-slate-500">Low Stock</p><p id="lowStock" class="text-2xl font-black text-red-500">0</p></div>
+  </div>
+
+  <input id="search" oninput="render()" placeholder="🔍 Search product..." class="w-full p-3 rounded-xl border mb-4 outline-none">
+
+  <div id="adminBox" class="bg-white p-4 rounded-2xl shadow mb-4">
+    <h2 class="font-bold mb-3">➕ Add Product</h2>
+    <input id="pName" placeholder="Product name" class="w-full border rounded-xl p-3 mb-2">
+    <div class="flex gap-2">
+      <input id="pQty" type="number" placeholder="Qty" class="flex-1 border rounded-xl p-3">
+      <input id="pPrice" type="number" placeholder="Price R" class="flex-1 border rounded-xl p-3">
+    </div>
+    <button onclick="addProduct()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mt-3">Add Product</button>
+  </div>
+
+  <div id="viewerMsg" class="hidden bg-amber-100 border border-amber-300 text-amber-800 p-3 rounded-xl text-sm mb-4">👀 You are a Viewer — you can only view stock. Ask Admin to add products.</div>
+
+  <div id="list" class="space-y-3"></div>
+</main>
+
+<script>
+let products = JSON.parse(localStorage.getItem('stocksync_products') || '[]');
+document.getElementById('welcome').textContent = `Hi ${user.name} • ${user.role}`;
+if(user.role !== 'Admin'){
+  document.getElementById('adminBox').style.display='none';
+  document.getElementById('viewerMsg').classList.remove('hidden');
 }
-function setProducts(p){ localStorage.setItem('stocksync_products', JSON.stringify(p)); }
+function save(){ localStorage.setItem('stocksync_products', JSON.stringify(products)); render(); }
+function addProduct(){
+  if(user.role!=='Admin') return alert('Viewers cannot add products');
+  const name=document.getElementById('pName').value.trim();
+  const qty=parseInt(document.getElementById('pQty').value);
+  const price=parseFloat(document.getElementById('pPrice').value)||0;
+  if(!name || isNaN(qty)) return alert('Enter name and qty');
+  products.push({id:Date.now(), name, qty, price});
+  document.getElementById('pName').value=''; document.getElementById('pQty').value=''; document.getElementById('pPrice').value='';
+  save();
+}
+function del(id){ if(user.role!=='Admin') return; if(confirm('Delete this product?')){ products=products.filter(p=>p.id!==id); save(); } }
+function changeQty(id, amount){ if(user.role!=='Admin') return; const p=products.find(x=>x.id===id); p.qty=Math.max(0,p.qty+amount); save(); }
 function render(){
-  let products = getProducts();
-  let sales = JSON.parse(localStorage.getItem('stocksync_sales') || '[]');
-  let totalSales = sales.reduce((s,x)=>s+Number(x.total||0),0);
-  let low = products.filter(p=> Number(p.qty) <= 5);
-  let value = products.reduce((s,p)=> s + (Number(p.qty)*Number(p.price||0)),0);
-  document.getElementById('totalCount').textContent = products.length;
-  document.getElementById('lowCount').textContent = low.length + ' Items';
-  document.getElementById('salesTotal').textContent = 'R ' + totalSales.toLocaleString();
-  document.getElementById('stockValue').textContent = 'R ' + value.toLocaleString();
-  let toShow = products;
-  if(currentView==='dashboard' || currentView==='low') { toShow = low; document.getElementById('tableTitle').textContent='Low Stock Alert'; document.getElementById('tableHint').textContent='Products with 5 or less left'; }
-  if(currentView==='products'){ toShow = products; document.getElementById('tableTitle').textContent='All Products'; document.getElementById('tableHint').textContent='Tap Sell to record a sale, Delete to remove'; }
-  if(currentView==='sales'){ document.getElementById('tableTitle').textContent='Sales History'; document.getElementById('tableHint').textContent='All sales you recorded today'; }
-  let tbody = document.getElementById('productTable');
-  let role = localStorage.getItem('userRole');
-  let canEdit = role !== 'Viewer';
-  tbody.innerHTML = '';
-  document.getElementById('emptyMsg').style.display = toShow.length===0 ? 'block':'none';
-  if(currentView==='sales'){
-    if(sales.length===0){ document.getElementById('emptyMsg').textContent='No sales yet. Go to Products and tap Sell!'; document.getElementById('emptyMsg').style.display='block'; }
-    sales.forEach(s=>{
-      let tr=document.createElement('tr');
-      tr.innerHTML = `<td>${s.name}</td><td>Sale</td><td>${s.qty}</td><td>R ${s.total}</td><td class="ok">Sold</td><td>-</td>`;
-      tbody.appendChild(tr);
-    });
-    return;
-  }
-  toShow.forEach((p)=>{
-    let realIdx = products.indexOf(p);
-    let status = Number(p.qty)<=5 ? '<span class="low">Low</span>' : '<span class="ok">OK</span>';
-    let tr=document.createElement('tr');
-    tr.innerHTML = `<td>${p.name}</td><td>${p.category}</td><td>${p.qty}</td><td>R ${p.price}</td><td>${status}</td><td>${canEdit ? `<button class="smallBtn sellBtn" onclick="sellProduct(${realIdx})">Sell</button><button class="smallBtn delBtn" onclick="deleteProduct(${realIdx})">Delete</button>` : '<span style="color:#64748b;">View Only</span>'}</td>`;
-    tbody.appendChild(tr);
+  const q=document.getElementById('search').value.toLowerCase();
+  const filtered=products.filter(p=>p.name.toLowerCase().includes(q));
+  document.getElementById('totalItems').textContent=products.length;
+  document.getElementById('totalQty').textContent=products.reduce((a,b)=>a+b.qty,0);
+  document.getElementById('lowStock').textContent=products.filter(p=>p.qty<5).length;
+  document.getElementById('list').innerHTML = filtered.length? '' : '<p class="text-center text-slate-400 py-8">No products yet. Add one above.</p>';
+  filtered.forEach(p=>{
+    const div=document.createElement('div');
+    div.className='bg-white p-4 rounded-2xl shadow flex justify-between items-center';
+    div.innerHTML=`
+      <div><p class="font-bold">${p.name}</p><p class="text-sm text-slate-500">R ${p.price.toFixed(2)} • ${p.qty<5?'⚠️ Low Stock':p.qty+' in stock'}</p></div>
+      <div class="flex items-center gap-2">
+        ${user.role==='Admin'?`<button onclick="changeQty(${p.id},-1)" class="bg-slate-200 w-8 h-8 rounded-full font-bold">-</button><span class="font-black w-8 text-center">${p.qty}</span><button onclick="changeQty(${p.id},1)" class="bg-slate-200 w-8 h-8 rounded-full font-bold">+</button><button onclick="del(${p.id})" class="text-red-500 font-bold ml-1">🗑️</button>`:`<span class="font-black bg-slate-100 px-3 py-1 rounded-full">${p.qty}</span>`}
+      </div>`;
+    document.getElementById('list').appendChild(div);
   });
 }
-function openAddProduct(){
-  if(localStorage.getItem('userRole')==='Viewer'){ alert('Only Admin & Staff can add products!'); return; }
-  document.getElementById('addModal').style.display='flex';
+function logout(){
+  sessionStorage.removeItem('stocksync_user');
+  sessionStorage.clear();
+  window.location.replace('index.html');
 }
-function closeModal(){ document.getElementById('addModal').style.display='none'; }
-function saveProduct(){
-  let name=document.getElementById('newName').value.trim();
-  let cat=document.getElementById('newCategory').value.trim()||'General';
-  let qty=document.getElementById('newQty').value;
-  let price=document.getElementById('newPrice').value||0;
-  if(!name||!qty){ alert('Please enter Name and Quantity!'); return; }
-  let p=getProducts(); p.push({name, category:cat, qty:Number(qty), price:Number(price)}); setProducts(p);
-  document.getElementById('newName').value=''; document.getElementById('newCategory').value=''; document.getElementById('newQty').value=''; document.getElementById('newPrice').value='';
-  closeModal(); currentView='products'; setActive('productsLink'); render(); alert(name+' added! ✅');
-}
-function deleteProduct(i){ if(!confirm('Delete this product?')) return; let p=getProducts(); p.splice(i,1); setProducts(p); render(); }
-function sellProduct(i){
-  let p=getProducts(); let item=p[i]; if(Number(item.qty)<=0){ alert('Out of stock!'); return; }
-  let q=prompt('How many '+item.name+' sold?', '1'); if(!q) return; q=Number(q);
-  if(q>Number(item.qty)){ alert('Not enough stock! Only '+item.qty+' left'); return; }
-  item.qty = Number(item.qty)-q; setProducts(p);
-  let sales=JSON.parse(localStorage.getItem('stocksync_sales')||'[]'); sales.push({name:item.name, qty:q, total:q*Number(item.price||0)}); localStorage.setItem('stocksync_sales', JSON.stringify(sales));
-  render(); alert('Sale recorded! R '+(q*Number(item.price||0))+' ✅');
-}
-function setActive(id){ ['dashboardLink','productsLink','lowStockLink','salesLink','settingsLink'].forEach(x=>document.getElementById(x).classList.remove('active')); if(document.getElementById(id)) document.getElementById(id).classList.add('active'); }
-function openSettings(){
-  document.getElementById('settingName').value = localStorage.getItem('userName')||'';
-  document.getElementById('settingRole').value = localStorage.getItem('userRole')||'Viewer';
-  document.getElementById('settingsModal').style.display='flex';
-}
-function closeSettings(){ document.getElementById('settingsModal').style.display='none'; }
-function saveSettings(){
-  localStorage.setItem('userName', document.getElementById('settingName').value);
-  localStorage.setItem('userRole', document.getElementById('settingRole').value);
-  closeSettings(); location.reload();
-}
-function clearAllData(){
-  if(!confirm('Clear all your added products and sales?')) return;
-  localStorage.removeItem('stocksync_products'); localStorage.removeItem('stocksync_sales'); location.reload();
-}
-document.addEventListener('DOMContentLoaded', function(){
-  let name=localStorage.getItem('userName'); let role=localStorage.getItem('userRole');
-  if(!name){ window.location.href='index.html'; return; }
-  document.getElementById('welcomeText').textContent='Welcome back, '+name+'! 👋';
-  document.getElementById('roleText').textContent='Logged in as '+role+' — here is what is happening today.';
-  if(role==='Viewer') document.getElementById('addProductBtn').style.display='none';
-  document.getElementById('addProductBtn').addEventListener('click', openAddProduct);
-  document.getElementById('menuBtn').addEventListener('click', ()=>document.getElementById('sidebar').classList.toggle('open'));
-  document.getElementById('dashboardLink').addEventListener('click', ()=>{ currentView='dashboard'; setActive('dashboardLink'); render(); document.getElementById('sidebar').classList.remove('open'); });
-  document.getElementById('productsLink').addEventListener('click', ()=>{ currentView='products'; setActive('productsLink'); render(); document.getElementById('sidebar').classList.remove('open'); });
-  document.getElementById('lowStockLink').addEventListener('click', ()=>{ currentView='low'; setActive('lowStockLink'); render(); document.getElementById('sidebar').classList.remove('open'); });
-  document.getElementById('salesLink').addEventListener('click', ()=>{ currentView='sales'; setActive('salesLink'); render(); document.getElementById('sidebar').classList.remove('open'); });
-  document.getElementById('settingsLink').addEventListener('click', ()=>{ setActive('settingsLink'); openSettings(); });
-  document.getElementById('cardTotal').addEventListener('click', ()=>{ currentView='products'; setActive('productsLink'); render(); });
-  document.getElementById('cardLow').addEventListener('click', ()=>{ currentView='low'; setActive('lowStockLink'); render(); });
-  document.getElementById('cardSales').addEventListener('click', ()=>{ currentView='sales'; setActive('salesLink'); render(); });
-  document.getElementById('logoutBtn').addEventListener('click', ()=>{
-    let keepProducts = localStorage.getItem('stocksync_products');
-    let keepSales = localStorage.getItem('stocksync_sales');
-    localStorage.clear();
-    if(keepProducts) localStorage.setItem('stocksync_products', keepProducts);
-    if(keepSales) localStorage.setItem('stocksync_sales', keepSales);
-    window.location.href='index.html';
-  });
-  render();
-});
+render();
 </script>
 </body>
 </html>
