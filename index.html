@@ -26,7 +26,7 @@
   <input id="password" type="password" placeholder="Admin password" class="w-full border rounded-xl p-3 mt-1 mb-4 outline-none focus:border-blue-500">
   <button onclick="login()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700">Login →</button>
   <p id="error" class="text-red-500 text-sm text-center mt-3 hidden"></p>
-  <p class="text-center text-xs text-slate-400 mt-4">Admin password: <b>admin123</b> — change it later</p>
+  <p class="text-center text-xs text-slate-400 mt-4">Default Admin password: <b>admin123</b></p>
 </div>
 <script>
 function login(){
@@ -35,8 +35,9 @@ function login(){
   const pass = document.getElementById('password').value;
   const err = document.getElementById('error');
   if(!name){ err.textContent="Please enter your name"; err.classList.remove('hidden'); return; }
-  if(role==="Admin" && pass!=="admin123"){
-    err.textContent="Wrong Admin password!"; err.classList.remove('hidden'); return;
+  const savedPass = localStorage.getItem('stocksync_admin_pass') || "admin123";
+  if(role==="Admin" && pass!==savedPass){
+    err.textContent="Wrong Admin password! Try: " + savedPass; err.classList.remove('hidden'); return;
   }
   const user = { name, role, loginTime: Date.now() };
   sessionStorage.setItem('stocksync_user', JSON.stringify(user));

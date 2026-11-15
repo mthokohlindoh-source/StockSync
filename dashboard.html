@@ -8,89 +8,132 @@
 <meta name="theme-color" content="#0f172a">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-// SECURITY: Block direct access + Block back button after logout
 const saved = sessionStorage.getItem('stocksync_user');
 if(!saved){ window.location.replace('index.html'); }
 const user = saved ? JSON.parse(saved) : null;
-// Auto logout after 30 mins
 if(user && Date.now() - user.loginTime > 30*60*1000){ sessionStorage.removeItem('stocksync_user'); window.location.replace('index.html'); }
 history.pushState(null, null, location.href);
 window.onpopstate = function(){ history.pushState(null, null, location.href); };
 </script>
+<style>.menu-active{background:#1e293b;color:white!important}.tab{display:none}.tab.active{display:block}</style>
 </head>
 <body class="bg-slate-100 min-h-screen">
-<header class="bg-slate-900 text-white p-4 flex justify-between items-center sticky top-0 z-10">
+<div class="bg-slate-900 text-white p-4 flex justify-between items-center sticky top-0 z-20">
+  <button onclick="toggleMenu()" class="text-2xl">☰</button>
   <div><h1 class="font-black text-xl">📦 StockSync</h1><p id="welcome" class="text-xs text-slate-300"></p></div>
-  <button onclick="logout()" class="bg-red-500 px-4 py-2 rounded-lg font-bold text-sm">Logout</button>
-</header>
-
+  <button onclick="logout()" class="bg-red-500 px-3 py-1.5 rounded-lg font-bold text-sm">Logout</button>
+</div>
+<div id="sidebar" class="fixed left-0 top-0 bottom-0 w-64 bg-slate-950 text-slate-400 z-30 p-5 -translate-x-full transition-transform shadow-2xl">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-black text-sky-400">📦 StockSync</h2>
+    <button onclick="toggleMenu()" class="text-white text-xl">✕</button>
+  </div>
+  <button onclick="showTab('dashboard')" id="m-dashboard" class="w-full text-left p-3 rounded-xl mb-1 menu-active">🏠 Dashboard</button>
+  <button onclick="showTab('products')" id="m-products" class="w-full text-left p-3 rounded-xl mb-1">📦 Products</button>
+  <button onclick="showTab('lowstock')" id="m-lowstock" class="w-full text-left p-3 rounded-xl mb-1">📉 Low Stock</button>
+  <button onclick="showTab('sales')" id="m-sales" class="w-full text-left p-3 rounded-xl mb-1">💰 Sales</button>
+  <button onclick="showTab('settings')" id="m-settings" class="w-full text-left p-3 rounded-xl mb-1">⚙️ Settings</button>
+  <button onclick="logout()" class="w-full text-left p-3 rounded-xl mb-1 text-red-400">🚪 Logout</button>
+  <p class="text-xs text-slate-500 mt-6">Logged in as:<br><b id="sideUser" class="text-white"></b></p>
+</div>
+<div id="overlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/50 z-20 hidden"></div>
 <main class="p-4 max-w-3xl mx-auto pb-24">
-  <div class="grid grid-cols-3 gap-3 mb-4">
-    <div class="bg-white p-3 rounded-xl text-center"><p class="text-xs text-slate-500">Total Items</p><p id="totalItems" class="text-2xl font-black">0</p></div>
-    <div class="bg-white p-3 rounded-xl text-center"><p class="text-xs text-slate-500">Total Qty</p><p id="totalQty" class="text-2xl font-black">0</p></div>
-    <div class="bg-white p-3 rounded-xl text-center"><p class="text-xs text-slate-500">Low Stock</p><p id="lowStock" class="text-2xl font-black text-red-500">0</p></div>
-  </div>
-
-  <input id="search" oninput="render()" placeholder="🔍 Search product..." class="w-full p-3 rounded-xl border mb-4 outline-none">
-
-  <div id="adminBox" class="bg-white p-4 rounded-2xl shadow mb-4">
-    <h2 class="font-bold mb-3">➕ Add Product</h2>
-    <input id="pName" placeholder="Product name" class="w-full border rounded-xl p-3 mb-2">
-    <div class="flex gap-2">
-      <input id="pQty" type="number" placeholder="Qty" class="flex-1 border rounded-xl p-3">
-      <input id="pPrice" type="number" placeholder="Price R" class="flex-1 border rounded-xl p-3">
+  <div id="tab-dashboard" class="tab active">
+    <h2 class="text-2xl font-black">Welcome back, <span id="dashName"></span>! 👋</h2>
+    <p class="text-slate-500 text-sm mb-4">Here is what is happening in your shop today</p>
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      <div class="bg-white p-3 rounded-xl text-center border-t-4 border-blue-500"><p class="text-xs text-slate-500">Total Items</p><p id="totalItems" class="text-2xl font-black">0</p></div>
+      <div class="bg-white p-3 rounded-xl text-center border-t-4 border-green-500"><p class="text-xs text-slate-500">Total Qty</p><p id="totalQty" class="text-2xl font-black">0</p></div>
+      <div class="bg-white p-3 rounded-xl text-center border-t-4 border-red-500"><p class="text-xs text-slate-500">Low Stock</p><p id="lowStock" class="text-2xl font-black text-red-500">0</p></div>
     </div>
-    <button onclick="addProduct()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mt-3">Add Product</button>
+    <div class="bg-white p-4 rounded-2xl shadow mb-3 flex justify-between"><div><p class="text-sm text-slate-500">Today's Sales</p><p id="todaySales" class="text-2xl font-black">R 0.00</p></div><span class="text-3xl">💰</span></div>
+    <div class="bg-white p-4 rounded-2xl shadow"><p class="font-bold mb-2">Quick Actions</p><div class="flex gap-2"><button onclick="showTab('products')" class="flex-1 bg-blue-600 text-white py-2 rounded-xl font-bold">➕ Add Product</button><button onclick="showTab('sales')" class="flex-1 bg-green-600 text-white py-2 rounded-xl font-bold">💰 Make Sale</button></div></div>
   </div>
-
-  <div id="viewerMsg" class="hidden bg-amber-100 border border-amber-300 text-amber-800 p-3 rounded-xl text-sm mb-4">👀 You are a Viewer — you can only view stock. Ask Admin to add products.</div>
-
-  <div id="list" class="space-y-3"></div>
+  <div id="tab-products" class="tab">
+    <h2 class="text-2xl font-black mb-3">📦 Products</h2>
+    <input id="search" oninput="render()" placeholder="🔍 Search product..." class="w-full p-3 rounded-xl border mb-4 outline-none">
+    <div id="adminBox" class="bg-white p-4 rounded-2xl shadow mb-4">
+      <h3 class="font-bold mb-3">➕ Add Product</h3>
+      <input id="pName" placeholder="Product name" class="w-full border rounded-xl p-3 mb-2">
+      <div class="flex gap-2"><input id="pQty" type="number" placeholder="Qty" class="flex-1 border rounded-xl p-3"><input id="pPrice" type="number" placeholder="Price R" class="flex-1 border rounded-xl p-3"></div>
+      <button onclick="addProduct()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mt-3">Add Product</button>
+    </div>
+    <div id="viewerMsg" class="hidden bg-amber-100 border border-amber-300 text-amber-800 p-3 rounded-xl text-sm mb-4">👀 You are a Viewer — view only.</div>
+    <div id="list" class="space-y-3"></div>
+  </div>
+  <div id="tab-lowstock" class="tab">
+    <h2 class="text-2xl font-black mb-1">📉 Low Stock</h2>
+    <p class="text-slate-500 text-sm mb-4">Products with less than 5 left — restock soon!</p>
+    <div id="lowList" class="space-y-3"></div>
+  </div>
+  <div id="tab-sales" class="tab">
+    <h2 class="text-2xl font-black mb-3">💰 Sales</h2>
+    <div id="saleAdminBox" class="bg-white p-4 rounded-2xl shadow mb-4">
+      <label class="font-bold text-sm">Select Product</label>
+      <select id="saleProduct" class="w-full border rounded-xl p-3 my-2"></select>
+      <label class="font-bold text-sm">Quantity Sold</label>
+      <input id="saleQty" type="number" value="1" min="1" class="w-full border rounded-xl p-3 my-2">
+      <button onclick="makeSale()" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl mt-2">Record Sale →</button>
+    </div>
+    <div class="bg-white p-4 rounded-2xl shadow mb-3"><p class="text-sm text-slate-500">Total Sales Ever</p><p id="totalSales" class="text-2xl font-black text-green-600">R 0.00</p></div>
+    <h3 class="font-bold mb-2">Recent Sales</h3>
+    <div id="salesList" class="space-y-2"></div>
+  </div>
+  <div id="tab-settings" class="tab">
+    <h2 class="text-2xl font-black mb-3">⚙️ Settings</h2>
+    <div class="bg-white p-4 rounded-2xl shadow mb-4"><p class="font-bold mb-1">Your Profile</p><p class="text-sm text-slate-500">Name: <b id="setName"></b><br>Role: <b id="setRole"></b></p></div>
+    <div id="adminSettings" class="bg-white p-4 rounded-2xl shadow mb-4">
+      <p class="font-bold mb-2">Change Admin Password</p>
+      <input id="newPass" type="text" placeholder="New admin password" class="w-full border rounded-xl p-3 mb-2">
+      <button onclick="changePass()" class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl">Save New Password</button>
+    </div>
+    <div class="bg-white p-4 rounded-2xl shadow"><p class="font-bold mb-2 text-red-600">Danger Zone</p><button onclick="clearAll()" class="w-full bg-red-100 text-red-600 font-bold py-3 rounded-xl">🗑️ Clear All Products & Sales</button></div>
+  </div>
 </main>
-
 <script>
 let products = JSON.parse(localStorage.getItem('stocksync_products') || '[]');
+let sales = JSON.parse(localStorage.getItem('stocksync_sales') || '[]');
 document.getElementById('welcome').textContent = `Hi ${user.name} • ${user.role}`;
+document.getElementById('dashName').textContent = user.name;
+document.getElementById('sideUser').textContent = user.name + ' (' + user.role + ')';
+document.getElementById('setName').textContent = user.name;
+document.getElementById('setRole').textContent = user.role;
 if(user.role !== 'Admin'){
   document.getElementById('adminBox').style.display='none';
+  document.getElementById('saleAdminBox').style.display='none';
+  document.getElementById('adminSettings').style.display='none';
   document.getElementById('viewerMsg').classList.remove('hidden');
 }
-function save(){ localStorage.setItem('stocksync_products', JSON.stringify(products)); render(); }
-function addProduct(){
-  if(user.role!=='Admin') return alert('Viewers cannot add products');
-  const name=document.getElementById('pName').value.trim();
-  const qty=parseInt(document.getElementById('pQty').value);
-  const price=parseFloat(document.getElementById('pPrice').value)||0;
-  if(!name || isNaN(qty)) return alert('Enter name and qty');
-  products.push({id:Date.now(), name, qty, price});
-  document.getElementById('pName').value=''; document.getElementById('pQty').value=''; document.getElementById('pPrice').value='';
-  save();
-}
-function del(id){ if(user.role!=='Admin') return; if(confirm('Delete this product?')){ products=products.filter(p=>p.id!==id); save(); } }
+function toggleMenu(){ const s=document.getElementById('sidebar'), o=document.getElementById('overlay'); const open=s.classList.contains('-translate-x-full'); s.classList.toggle('-translate-x-full',!open); o.classList.toggle('hidden',!open); }
+function showTab(name){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('tab-'+name).classList.add('active'); document.querySelectorAll('#sidebar button').forEach(b=>b.classList.remove('menu-active')); const btn=document.getElementById('m-'+name); if(btn) btn.classList.add('menu-active'); const s=document.getElementById('sidebar'); if(!s.classList.contains('-translate-x-full')) toggleMenu(); render(); }
+function save(){ localStorage.setItem('stocksync_products', JSON.stringify(products)); localStorage.setItem('stocksync_sales', JSON.stringify(sales)); render(); }
+function addProduct(){ if(user.role!=='Admin') return alert('Viewers cannot add'); const name=document.getElementById('pName').value.trim(); const qty=parseInt(document.getElementById('pQty').value); const price=parseFloat(document.getElementById('pPrice').value)||0; if(!name||isNaN(qty)) return alert('Enter name and qty'); products.push({id:Date.now(), name, qty, price}); document.getElementById('pName').value=''; document.getElementById('pQty').value=''; document.getElementById('pPrice').value=''; save(); alert('Product added!'); }
+function del(id){ if(user.role!=='Admin') return; if(confirm('Delete?')){ products=products.filter(p=>p.id!==id); save(); } }
 function changeQty(id, amount){ if(user.role!=='Admin') return; const p=products.find(x=>x.id===id); p.qty=Math.max(0,p.qty+amount); save(); }
+function makeSale(){ if(user.role!=='Admin') return alert('Viewers cannot sell'); const pid=parseInt(document.getElementById('saleProduct').value); const qty=parseInt(document.getElementById('saleQty').value); const p=products.find(x=>x.id===pid); if(!p) return alert('Select a product'); if(qty>p.qty) return alert('Not enough stock! Only '+p.qty+' left'); p.qty-=qty; const total=qty*p.price; sales.unshift({id:Date.now(), name:p.name, qty, total, date:new Date().toLocaleString()}); save(); alert('Sale recorded! R '+total.toFixed(2)); }
+function changePass(){ const np=document.getElementById('newPass').value.trim(); if(!np) return alert('Type new password'); localStorage.setItem('stocksync_admin_pass', np); alert('Password changed to: '+np); document.getElementById('newPass').value=''; }
+function clearAll(){ if(confirm('Delete ALL products and sales?')){ products=[]; sales=[]; save(); alert('Cleared!'); } }
 function render(){
-  const q=document.getElementById('search').value.toLowerCase();
+  const q=(document.getElementById('search')?.value||'').toLowerCase();
   const filtered=products.filter(p=>p.name.toLowerCase().includes(q));
   document.getElementById('totalItems').textContent=products.length;
   document.getElementById('totalQty').textContent=products.reduce((a,b)=>a+b.qty,0);
   document.getElementById('lowStock').textContent=products.filter(p=>p.qty<5).length;
-  document.getElementById('list').innerHTML = filtered.length? '' : '<p class="text-center text-slate-400 py-8">No products yet. Add one above.</p>';
-  filtered.forEach(p=>{
-    const div=document.createElement('div');
-    div.className='bg-white p-4 rounded-2xl shadow flex justify-between items-center';
-    div.innerHTML=`
-      <div><p class="font-bold">${p.name}</p><p class="text-sm text-slate-500">R ${p.price.toFixed(2)} • ${p.qty<5?'⚠️ Low Stock':p.qty+' in stock'}</p></div>
-      <div class="flex items-center gap-2">
-        ${user.role==='Admin'?`<button onclick="changeQty(${p.id},-1)" class="bg-slate-200 w-8 h-8 rounded-full font-bold">-</button><span class="font-black w-8 text-center">${p.qty}</span><button onclick="changeQty(${p.id},1)" class="bg-slate-200 w-8 h-8 rounded-full font-bold">+</button><button onclick="del(${p.id})" class="text-red-500 font-bold ml-1">🗑️</button>`:`<span class="font-black bg-slate-100 px-3 py-1 rounded-full">${p.qty}</span>`}
-      </div>`;
-    document.getElementById('list').appendChild(div);
-  });
+  const today=new Date().toLocaleDateString();
+  const todayTotal=sales.filter(s=>new Date(s.id).toLocaleDateString()===today).reduce((a,b)=>a+b.total,0);
+  document.getElementById('todaySales').textContent='R '+todayTotal.toFixed(2);
+  document.getElementById('totalSales').textContent='R '+sales.reduce((a,b)=>a+b.total,0).toFixed(2);
+  document.getElementById('list').innerHTML = filtered.length? '' : '<p class="text-center text-slate-400 py-8">No products yet.</p>';
+  filtered.forEach(p=>{ const div=document.createElement('div'); div.className='bg-white p-4 rounded-2xl shadow flex justify-between items-center'; div.innerHTML=`<div><p class="font-bold">${p.name}</p><p class="text-sm text-slate-500">R ${p.price.toFixed(2)} • ${p.qty<5?'⚠️ Low Stock':p.qty+' in stock'}</p></div><div class="flex items-center gap-2">${user.role==='Admin'?`<button onclick="changeQty(${p.id},-1)" class="bg-slate-200 w-8 h-8 rounded-full font-bold">-</button><span class="font-black w-8 text-center">${p.qty}</span><button onclick="changeQty(${p.id},1)" class="bg-slate-200 w-8 h-8 rounded-full font-bold">+</button><button onclick="del(${p.id})" class="text-red-500 font-bold ml-1">🗑️</button>`:`<span class="font-black bg-slate-100 px-3 py-1 rounded-full">${p.qty}</span>`}</div>`; document.getElementById('list').appendChild(div); });
+  const low=products.filter(p=>p.qty<5);
+  document.getElementById('lowList').innerHTML = low.length? '' : '<p class="bg-white p-6 rounded-2xl text-center text-slate-400">🎉 No low stock! All good.</p>';
+  low.forEach(p=>{ const d=document.createElement('div'); d.className='bg-white p-4 rounded-2xl shadow border-l-4 border-red-500 flex justify-between'; d.innerHTML=`<div><p class="font-bold">${p.name}</p><p class="text-sm text-red-500">Only ${p.qty} left!</p></div><button onclick="showTab('products')" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-bold">Restock</button>`; document.getElementById('lowList').appendChild(d); });
+  const sel=document.getElementById('saleProduct');
+  sel.innerHTML=products.map(p=>`<option value="${p.id}">${p.name} - R${p.price} (${p.qty} left)</option>`).join('') || '<option>No products</option>';
+  document.getElementById('salesList').innerHTML = sales.length? '' : '<p class="text-slate-400 text-center py-4">No sales yet.</p>';
+  sales.slice(0,20).forEach(s=>{ const d=document.createElement('div'); d.className='bg-white p-3 rounded-xl shadow flex justify-between'; d.innerHTML=`<div><p class="font-bold">${s.name} x ${s.qty}</p><p class="text-xs text-slate-400">${s.date}</p></div><p class="font-black text-green-600">R ${s.total.toFixed(2)}</p>`; document.getElementById('salesList').appendChild(d); });
 }
-function logout(){
-  sessionStorage.removeItem('stocksync_user');
-  sessionStorage.clear();
-  window.location.replace('index.html');
-}
+function logout(){ sessionStorage.removeItem('stocksync_user'); sessionStorage.clear(); window.location.replace('index.html'); }
 render();
 </script>
 </body>
