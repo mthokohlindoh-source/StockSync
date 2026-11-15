@@ -5,119 +5,209 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StockSync - Dashboard</title>
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-  body { background: #f1f5f9; display: flex; }
-  .sidebar { width: 220px; background: #0f172a; color: white; height: 100vh; padding: 25px 20px; position: fixed; left: 0; top: 0; z-index: 100; transition: transform 0.3s; }
-  .sidebar h2 { color: #38bdf8; margin-bottom: 30px; }
-  .sidebar a { display: block; color: #cbd5e1; text-decoration: none; padding: 12px 10px; border-radius: 8px; margin-bottom: 5px; cursor: pointer; }
-  .sidebar a.active, .sidebar a:hover { background: #1e293b; color: white; }
-  .main { margin-left: 220px; padding: 30px; width: 100%; }
-  .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 12px; flex-wrap: wrap; }
-  .top h1 { font-size: 26px; color: #0f172a; }
-  .top p { color: #64748b; }
-  .cards { display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
-  .card { background: white; padding: 20px; border-radius: 12px; flex: 1; min-width: 160px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
-  .card p { color: #64748b; font-size: 14px; }
-  .card h3 { font-size: 28px; margin-top: 8px; }
-  .blue { border-top: 4px solid #38bdf8; }
-  .green { border-top: 4px solid #22c55e; }
-  .red { border-top: 4px solid #ef4444; }
-  .orange { border-top: 4px solid #f97316; }
-  .box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 480px; }
-  th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; }
-  th { color: #64748b; font-size: 13px; }
-  .low { color: #ef4444; font-weight: bold; }
-  .ok { color: #22c55e; font-weight: bold; }
-  button { background: #0f172a; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; }
-  .menu-btn { display: none; }
-  /* MOBILE FIX */
-  @media (max-width: 768px) {
-    .sidebar { transform: translateX(-100%); }
-    .sidebar.open { transform: translateX(0); }
-    .main { margin-left: 0; padding: 16px; }
-    .menu-btn { display: block; }
-    .cards { flex-direction: column; }
-    .card { min-width: 100%; }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
+  body { background:#f1f5f9; display:flex; }
+  .sidebar { width:220px; background:#0f172a; color:white; height:100vh; padding:25px 20px; position:fixed; left:0; top:0; z-index:100; transition:transform 0.3s; }
+  .sidebar h2 { color:#38bdf8; margin-bottom:30px; }
+  .sidebar a { display:block; color:#cbd5e1; text-decoration:none; padding:12px 10px; border-radius:8px; margin-bottom:5px; cursor:pointer; }
+  .sidebar a.active, .sidebar a:hover { background:#1e293b; color:white; }
+  .main { margin-left:220px; padding:30px; width:100%; }
+  .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; gap:12px; flex-wrap:wrap; }
+  .top h1 { font-size:26px; color:#0f172a; }
+  .top p { color:#64748b; }
+  .cards { display:flex; gap:20px; margin-bottom:25px; flex-wrap:wrap; }
+  .card { background:white; padding:20px; border-radius:12px; flex:1; min-width:160px; box-shadow:0 4px 14px rgba(0,0,0,0.06); cursor:pointer; }
+  .card p { color:#64748b; font-size:14px; }
+  .card h3 { font-size:28px; margin-top:8px; }
+  .blue{border-top:4px solid #38bdf8;} .green{border-top:4px solid #22c55e;} .red{border-top:4px solid #ef4444;} .orange{border-top:4px solid #f97316;}
+  .box { background:white; padding:20px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.06); overflow-x:auto; margin-bottom:20px; }
+  table { width:100%; border-collapse:collapse; margin-top:15px; min-width:480px; }
+  th,td { text-align:left; padding:12px; border-bottom:1px solid #e2e8f0; }
+  th { color:#64748b; font-size:13px; }
+  .low{color:#ef4444; font-weight:bold;} .ok{color:#22c55e; font-weight:bold;}
+  button { background:#0f172a; color:white; border:none; padding:10px 18px; border-radius:8px; cursor:pointer; }
+  .smallBtn{padding:6px 10px; font-size:13px; margin-right:5px;} .delBtn{background:#ef4444;} .sellBtn{background:#22c55e;}
+  input,select { width:100%; padding:12px; margin:8px 0; border-radius:8px; border:1px solid #cbd5e1; }
+  .menu-btn{display:none;}
+  .modal{display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999; align-items:center; justify-content:center; padding:15px;}
+  .modalContent{background:white; padding:20px; border-radius:15px; width:100%; max-width:400px;}
+  @media(max-width:768px){
+    .sidebar{transform:translateX(-100%);} .sidebar.open{transform:translateX(0);}
+    .main{margin-left:0; padding:16px;} .menu-btn{display:block;} .cards{flex-direction:column;} .card{min-width:100%;}
   }
 </style>
 </head>
 <body>
-
 <div class="sidebar" id="sidebar">
   <h2>📦 StockSync</h2>
-  <a class="active">🏠 Dashboard</a>
+  <a id="dashboardLink" class="active">🏠 Dashboard</a>
   <a id="productsLink">📦 Products</a>
   <a id="lowStockLink">📉 Low Stock</a>
   <a id="salesLink">💰 Sales</a>
   <a id="settingsLink">⚙️ Settings</a>
   <a id="logoutBtn">🚪 Logout</a>
 </div>
-
 <div class="main">
   <div class="top">
     <div>
       <button class="menu-btn" id="menuBtn">☰</button>
       <h1 id="welcomeText">Welcome back! 👋</h1>
-      <p id="roleText">Here's what's happening in your shop today.</p>
+      <p id="roleText">Here's what's happening today.</p>
     </div>
     <button id="addProductBtn">+ Add Product</button>
   </div>
-
   <div class="cards">
-    <div class="card blue"><p>Total Products</p><h3>128</h3></div>
-    <div class="card green"><p>Today's Sales</p><h3>R 2,450</h3></div>
-    <div class="card red"><p>Low Stock</p><h3>7 Items</h3></div>
-    <div class="card orange"><p>Total Stock Value</p><h3>R 48,900</h3></div>
+    <div class="card blue" id="cardTotal"><p>Total Products</p><h3 id="totalCount">0</h3></div>
+    <div class="card green" id="cardSales"><p>Today's Sales</p><h3 id="salesTotal">R 0</h3></div>
+    <div class="card red" id="cardLow"><p>Low Stock</p><h3 id="lowCount">0 Items</h3></div>
+    <div class="card orange"><p>Total Stock Value</p><h3 id="stockValue">R 0</h3></div>
   </div>
-
   <div class="box">
-    <h3>Low Stock Alert</h3>
+    <h3 id="tableTitle">Low Stock Alert</h3>
+    <p id="tableHint" style="color:#64748b; font-size:13px; margin-top:5px;">Products with 5 or less left</p>
     <table>
-      <tr><th>Product</th><th>Category</th><th>Left</th><th>Status</th></tr>
-      <tr><td>Coca-Cola 500ml</td><td>Drinks</td><td>3</td><td class="low">Low</td></tr>
-      <tr><td>Bread - White</td><td>Bakery</td><td>5</td><td class="low">Low</td></tr>
-      <tr><td>Milk 2L</td><td>Dairy</td><td>2</td><td class="low">Critical</td></tr>
-      <tr><td>Sugar 1kg</td><td>Groceries</td><td>18</td><td class="ok">OK</td></tr>
+      <thead><tr><th>Product</th><th>Category</th><th>Left</th><th>Price</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody id="productTable"></tbody>
     </table>
+    <p id="emptyMsg" style="padding:15px 0; color:#64748b; display:none;">No products here yet. Click + Add Product!</p>
   </div>
 </div>
-
+<div class="modal" id="addModal">
+  <div class="modalContent">
+    <h3>➕ Add New Product</h3>
+    <input id="newName" placeholder="Product Name e.g. Coca-Cola">
+    <input id="newCategory" placeholder="Category e.g. Drinks">
+    <input id="newQty" type="number" placeholder="Quantity e.g. 10">
+    <input id="newPrice" type="number" placeholder="Price e.g. 25">
+    <button onclick="saveProduct()" style="width:100%; background:#22c55e; margin-top:10px;">Save Product</button>
+    <button onclick="closeModal()" style="width:100%; background:#64748b; margin-top:8px;">Cancel</button>
+  </div>
+</div>
+<div class="modal" id="settingsModal">
+  <div class="modalContent">
+    <h3>⚙️ Settings</h3>
+    <label>Your Name</label><input id="settingName">
+    <label>Role</label><select id="settingRole"><option>Admin</option><option>Staff</option><option>Viewer</option></select>
+    <button onclick="saveSettings()" style="width:100%; background:#22c55e; margin-top:10px;">Save Settings</button>
+    <button onclick="clearAllData()" style="width:100%; background:#ef4444; margin-top:8px;">Clear All My Added Products</button>
+    <button onclick="closeSettings()" style="width:100%; background:#64748b; margin-top:8px;">Close</button>
+  </div>
+</div>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // 1. Protect page - if not logged in, go back to login
-  const name = localStorage.getItem('userName');
-  const role = localStorage.getItem('userRole');
-  if (!name) { window.location.href = 'index.html'; return; }
-
-  document.getElementById('welcomeText').textContent = 'Welcome back, ' + name + '! 👋';
-  document.getElementById('roleText').textContent = 'Logged in as ' + role + ' — here is what is happening today.';
-
-  // Viewer cannot add products
-  if (role === 'Viewer') {
-    document.getElementById('addProductBtn').style.display = 'none';
-  }
-
-  // 2. Buttons now work
-  document.getElementById('addProductBtn').addEventListener('click', function() {
-    alert('Add Product coming soon — this button now works!');
-  });
-  document.getElementById('menuBtn').addEventListener('click', function() {
-    document.getElementById('sidebar').classList.toggle('open');
-  });
-  ['productsLink','lowStockLink','salesLink','settingsLink'].forEach(function(id) {
-    document.getElementById(id).addEventListener('click', function() {
-      alert('This page is coming soon!');
+let currentView = 'dashboard';
+let defaultProducts = [
+  {name:'Coca-Cola 500ml', category:'Drinks', qty:3, price:25},
+  {name:'Bread - White', category:'Bakery', qty:5, price:18},
+  {name:'Milk 2L', category:'Dairy', qty:2, price:42},
+  {name:'Sugar 1kg', category:'Groceries', qty:18, price:30},
+];
+function getProducts(){
+  let saved = JSON.parse(localStorage.getItem('stocksync_products') || 'null');
+  if(!saved) { localStorage.setItem('stocksync_products', JSON.stringify(defaultProducts)); return defaultProducts; }
+  return saved;
+}
+function setProducts(p){ localStorage.setItem('stocksync_products', JSON.stringify(p)); }
+function render(){
+  let products = getProducts();
+  let sales = JSON.parse(localStorage.getItem('stocksync_sales') || '[]');
+  let totalSales = sales.reduce((s,x)=>s+Number(x.total||0),0);
+  let low = products.filter(p=> Number(p.qty) <= 5);
+  let value = products.reduce((s,p)=> s + (Number(p.qty)*Number(p.price||0)),0);
+  document.getElementById('totalCount').textContent = products.length;
+  document.getElementById('lowCount').textContent = low.length + ' Items';
+  document.getElementById('salesTotal').textContent = 'R ' + totalSales.toLocaleString();
+  document.getElementById('stockValue').textContent = 'R ' + value.toLocaleString();
+  let toShow = products;
+  if(currentView==='dashboard' || currentView==='low') { toShow = low; document.getElementById('tableTitle').textContent='Low Stock Alert'; document.getElementById('tableHint').textContent='Products with 5 or less left'; }
+  if(currentView==='products'){ toShow = products; document.getElementById('tableTitle').textContent='All Products'; document.getElementById('tableHint').textContent='Tap Sell to record a sale, Delete to remove'; }
+  if(currentView==='sales'){ document.getElementById('tableTitle').textContent='Sales History'; document.getElementById('tableHint').textContent='All sales you recorded today'; }
+  let tbody = document.getElementById('productTable');
+  let role = localStorage.getItem('userRole');
+  let canEdit = role !== 'Viewer';
+  tbody.innerHTML = '';
+  document.getElementById('emptyMsg').style.display = toShow.length===0 ? 'block':'none';
+  if(currentView==='sales'){
+    if(sales.length===0){ document.getElementById('emptyMsg').textContent='No sales yet. Go to Products and tap Sell!'; document.getElementById('emptyMsg').style.display='block'; }
+    sales.forEach(s=>{
+      let tr=document.createElement('tr');
+      tr.innerHTML = `<td>${s.name}</td><td>Sale</td><td>${s.qty}</td><td>R ${s.total}</td><td class="ok">Sold</td><td>-</td>`;
+      tbody.appendChild(tr);
     });
+    return;
+  }
+  toShow.forEach((p)=>{
+    let realIdx = products.indexOf(p);
+    let status = Number(p.qty)<=5 ? '<span class="low">Low</span>' : '<span class="ok">OK</span>';
+    let tr=document.createElement('tr');
+    tr.innerHTML = `<td>${p.name}</td><td>${p.category}</td><td>${p.qty}</td><td>R ${p.price}</td><td>${status}</td><td>${canEdit ? `<button class="smallBtn sellBtn" onclick="sellProduct(${realIdx})">Sell</button><button class="smallBtn delBtn" onclick="deleteProduct(${realIdx})">Delete</button>` : '<span style="color:#64748b;">View Only</span>'}</td>`;
+    tbody.appendChild(tr);
   });
-
-  // 3. LOGOUT FIX - clears session cleanly, no crash
-  document.getElementById('logoutBtn').addEventListener('click', function() {
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userRole');
+}
+function openAddProduct(){
+  if(localStorage.getItem('userRole')==='Viewer'){ alert('Only Admin & Staff can add products!'); return; }
+  document.getElementById('addModal').style.display='flex';
+}
+function closeModal(){ document.getElementById('addModal').style.display='none'; }
+function saveProduct(){
+  let name=document.getElementById('newName').value.trim();
+  let cat=document.getElementById('newCategory').value.trim()||'General';
+  let qty=document.getElementById('newQty').value;
+  let price=document.getElementById('newPrice').value||0;
+  if(!name||!qty){ alert('Please enter Name and Quantity!'); return; }
+  let p=getProducts(); p.push({name, category:cat, qty:Number(qty), price:Number(price)}); setProducts(p);
+  document.getElementById('newName').value=''; document.getElementById('newCategory').value=''; document.getElementById('newQty').value=''; document.getElementById('newPrice').value='';
+  closeModal(); currentView='products'; setActive('productsLink'); render(); alert(name+' added! ✅');
+}
+function deleteProduct(i){ if(!confirm('Delete this product?')) return; let p=getProducts(); p.splice(i,1); setProducts(p); render(); }
+function sellProduct(i){
+  let p=getProducts(); let item=p[i]; if(Number(item.qty)<=0){ alert('Out of stock!'); return; }
+  let q=prompt('How many '+item.name+' sold?', '1'); if(!q) return; q=Number(q);
+  if(q>Number(item.qty)){ alert('Not enough stock! Only '+item.qty+' left'); return; }
+  item.qty = Number(item.qty)-q; setProducts(p);
+  let sales=JSON.parse(localStorage.getItem('stocksync_sales')||'[]'); sales.push({name:item.name, qty:q, total:q*Number(item.price||0)}); localStorage.setItem('stocksync_sales', JSON.stringify(sales));
+  render(); alert('Sale recorded! R '+(q*Number(item.price||0))+' ✅');
+}
+function setActive(id){ ['dashboardLink','productsLink','lowStockLink','salesLink','settingsLink'].forEach(x=>document.getElementById(x).classList.remove('active')); if(document.getElementById(id)) document.getElementById(id).classList.add('active'); }
+function openSettings(){
+  document.getElementById('settingName').value = localStorage.getItem('userName')||'';
+  document.getElementById('settingRole').value = localStorage.getItem('userRole')||'Viewer';
+  document.getElementById('settingsModal').style.display='flex';
+}
+function closeSettings(){ document.getElementById('settingsModal').style.display='none'; }
+function saveSettings(){
+  localStorage.setItem('userName', document.getElementById('settingName').value);
+  localStorage.setItem('userRole', document.getElementById('settingRole').value);
+  closeSettings(); location.reload();
+}
+function clearAllData(){
+  if(!confirm('Clear all your added products and sales?')) return;
+  localStorage.removeItem('stocksync_products'); localStorage.removeItem('stocksync_sales'); location.reload();
+}
+document.addEventListener('DOMContentLoaded', function(){
+  let name=localStorage.getItem('userName'); let role=localStorage.getItem('userRole');
+  if(!name){ window.location.href='index.html'; return; }
+  document.getElementById('welcomeText').textContent='Welcome back, '+name+'! 👋';
+  document.getElementById('roleText').textContent='Logged in as '+role+' — here is what is happening today.';
+  if(role==='Viewer') document.getElementById('addProductBtn').style.display='none';
+  document.getElementById('addProductBtn').addEventListener('click', openAddProduct);
+  document.getElementById('menuBtn').addEventListener('click', ()=>document.getElementById('sidebar').classList.toggle('open'));
+  document.getElementById('dashboardLink').addEventListener('click', ()=>{ currentView='dashboard'; setActive('dashboardLink'); render(); document.getElementById('sidebar').classList.remove('open'); });
+  document.getElementById('productsLink').addEventListener('click', ()=>{ currentView='products'; setActive('productsLink'); render(); document.getElementById('sidebar').classList.remove('open'); });
+  document.getElementById('lowStockLink').addEventListener('click', ()=>{ currentView='low'; setActive('lowStockLink'); render(); document.getElementById('sidebar').classList.remove('open'); });
+  document.getElementById('salesLink').addEventListener('click', ()=>{ currentView='sales'; setActive('salesLink'); render(); document.getElementById('sidebar').classList.remove('open'); });
+  document.getElementById('settingsLink').addEventListener('click', ()=>{ setActive('settingsLink'); openSettings(); });
+  document.getElementById('cardTotal').addEventListener('click', ()=>{ currentView='products'; setActive('productsLink'); render(); });
+  document.getElementById('cardLow').addEventListener('click', ()=>{ currentView='low'; setActive('lowStockLink'); render(); });
+  document.getElementById('cardSales').addEventListener('click', ()=>{ currentView='sales'; setActive('salesLink'); render(); });
+  document.getElementById('logoutBtn').addEventListener('click', ()=>{
+    let keepProducts = localStorage.getItem('stocksync_products');
+    let keepSales = localStorage.getItem('stocksync_sales');
     localStorage.clear();
-    window.location.href = 'index.html';
+    if(keepProducts) localStorage.setItem('stocksync_products', keepProducts);
+    if(keepSales) localStorage.setItem('stocksync_sales', keepSales);
+    window.location.href='index.html';
   });
+  render();
 });
 </script>
 </body>
