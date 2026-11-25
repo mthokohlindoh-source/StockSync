@@ -10,62 +10,52 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 <style>body{font-family:'Inter',sans-serif}</style>
 </head>
-<body class="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 relative overflow-hidden">
-<div class="absolute -top-20 -left-20 w-72 h-72 bg-blue-600 rounded-full blur-[100px] opacity-40"></div>
-<div class="absolute -bottom-20 -right-20 w-72 h-72 bg-violet-600 rounded-full blur-[100px] opacity-40"></div>
-
-<div class="relative bg-white w-full max-w-md rounded-[24px] p-6 sm:p-8 shadow-2xl">
-  <div class="flex items-center gap-3 mb-6">
-    <img src="logo.png" alt="StockSync Logo" class="w-12 h-12 rounded-2xl shadow-lg object-cover">
-    <div>
-      <h1 class="text-2xl font-black leading-none tracking-tight">StockSync</h1>
-      <p class="text-slate-500 text-[13px] mt-1">Smart stock for small business</p>
-    </div>
-    <span class="ml-auto bg-emerald-100 text-emerald-700 text-[11px] font-bold px-2.5 py-1 rounded-full">● LIVE</span>
+<body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
+<div class="bg-white w-full max-w-sm rounded-[28px] p-6 shadow-2xl">
+  <div class="flex flex-col items-center">
+    <img src="logo.png" class="w-20 h-20 rounded-2xl object-cover bg-slate-100 p-1" onerror="this.style.display='none'">
+    <h1 class="text-3xl font-black mt-3">StockSync</h1>
+    <p class="text-slate-400 text-sm">Manage your shop smartly</p>
   </div>
-
-  <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-5 flex gap-3">
-    <div class="text-2xl">👋</div>
-    <div>
-      <p class="font-bold text-sm">Welcome back!</p>
-      <p class="text-slate-500 text-xs leading-relaxed">Manage your shop stock from anywhere. No paper, no stress.</p>
-    </div>
+  <div class="mt-6">
+    <label class="text-sm font-bold">Your Name</label>
+    <input id="name" placeholder="e.g. Mthokozisi" class="w-full border rounded-xl p-3.5 mt-1 mb-3 outline-none focus:border-blue-600">
+    <label class="text-sm font-bold">Role</label>
+    <select id="role" class="w-full border rounded-xl p-3.5 mt-1 mb-3 bg-white"><option>Admin</option><option>Viewer</option><option>Cashier</option></select>
+    <label class="text-sm font-bold">Password</label>
+    <input id="pass" type="password" placeholder="Enter password" class="w-full border rounded-xl p-3.5 mt-1 mb-1 outline-none focus:border-blue-600">
+    <p class="text-xs text-slate-400 mb-3">Default: Admin = admin123 | Viewer = view123 | Cashier = cash123 — change in Settings</p>
+    <button onclick="login()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl">Login →</button>
+    <p id="err" class="text-red-500 text-sm font-bold text-center mt-3 hidden">Wrong password. Try again.</p>
   </div>
-
-  <label class="text-[13px] font-bold text-slate-700">Your Name</label>
-  <input id="name" type="text" placeholder="e.g. Thabo" class="w-full border border-slate-200 bg-slate-50 rounded-xl p-3.5 mt-1.5 mb-4 outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100 transition">
-
-  <label class="text-[13px] font-bold text-slate-700">Role</label>
-  <select id="role" class="w-full border border-slate-200 bg-slate-50 rounded-xl p-3.5 mt-1.5 mb-4 outline-none">
-    <option value="Admin">👑 Admin - Can Add / Edit / Delete</option>
-    <option value="Viewer">👀 Viewer - View Only</option>
-  </select>
-
-  <label class="text-[13px] font-bold text-slate-700">Admin Password <span class="font-normal text-slate-400">(Only for Admin)</span></label>
-  <input id="password" type="password" placeholder="••••••••" class="w-full border border-slate-200 bg-slate-50 rounded-xl p-3.5 mt-1.5 mb-4 outline-none focus:border-blue-600 focus:bg-white">
-
-  <button onclick="login()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl hover:bg-blue-600 active:scale-[0.98] transition shadow-lg">Login →</button>
-  <p id="error" class="text-red-500 text-sm text-center mt-3 hidden font-medium"></p>
-
-  <div class="flex items-center gap-2 justify-center mt-5 text-[11px] text-slate-400">
-    <span>🔒 Secure</span><span>•</span><span>📱 Works offline</span><span>•</span><span>⚡ Fast</span>
-  </div>
-  <p class="text-center text-[11px] text-slate-400 mt-2">Admin password: <b class="text-slate-600">admin123</b> — change it later</p>
+  <p class="text-center text-xs text-slate-400 mt-5">Tip: Tap ☰ in dashboard for Sales, Settings, Staff</p>
 </div>
 <script>
+function getUsers(){
+  let u = JSON.parse(localStorage.getItem('stocksync_users') || 'null');
+  if(!u){
+    u = [
+      {name:'Thabo', role:'Admin', pass:'admin123'},
+      {name:'Viewer', role:'Viewer', pass:'view123'},
+      {name:'Cashier', role:'Cashier', pass:'cash123'}
+    ];
+    localStorage.setItem('stocksync_users', JSON.stringify(u));
+  }
+  return u;
+}
 function login(){
   const name = document.getElementById('name').value.trim();
   const role = document.getElementById('role').value;
-  const pass = document.getElementById('password').value;
-  const err = document.getElementById('error');
-  if(!name){ err.textContent="Please enter your name"; err.classList.remove('hidden'); return; }
-  if(role==="Admin" && pass!=="admin123"){
-    err.textContent="Wrong Admin password!"; err.classList.remove('hidden'); return;
-  }
-  const user = { name, role, loginTime: Date.now() };
-  sessionStorage.setItem('stocksync_user', JSON.stringify(user));
-  window.location.replace('dashboard.html');
+  const pass = document.getElementById('pass').value.trim();
+  if(!name || !pass){ alert('Enter name and password'); return; }
+  const users = getUsers();
+  // Find user by role + password, allow any name typed if password matches role (so you can use your own name)
+  const match = users.find(x=>x.role===role && x.pass===pass);
+  if(!match){ document.getElementById('err').classList.remove('hidden'); return; }
+  sessionStorage.setItem('stocksync_user', JSON.stringify({name:name, role:role, loginTime:Date.now()}));
+  window.location.href='dashboard.html';
 }
+document.getElementById('pass').addEventListener('keydown', e=>{ if(e.key==='Enter') login(); });
 </script>
 </body>
 </html>
