@@ -1,190 +1,245 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StockSync - Dashboard</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0F17">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-body{font-family:'Inter',sans-serif}
-.glass{ background:linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.12); backdrop-filter:blur(12px); }
-.glass-strong{ background:rgba(17,22,34,0.88); backdrop-filter:blur(20px); }
-.active-nav-glow{ box-shadow:0 0 20px rgba(99,102,241,0.25), inset 0 0 12px rgba(99,102,241,0.12); }
-#sidebar{transition:transform .3s ease} #overlay{transition:opacity .3s ease}
-.light-mode{ background:#f1f5f9 !important; color:#0f172a !important; }
-.light-mode .glass{ background:white !important; border-color:#e2e8f0 !important; color:#0f172a !important; }
-.light-mode .glass-strong{ background:rgba(255,255,255,0.95) !important; }
-.light-mode .dark-input{ background:#f8fafc !important; border-color:#e2e8f0 !important; color:#0f172a !important; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#0B0F17;color:#fff;min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:inherit}
+.wrap{max-width:430px;margin:0 auto;padding-bottom:90px}
+/* HEADER */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px}
+.topbar h1{font-size:18px;font-weight:700}
+.hamburger{font-size:24px;color:#cbd5e1}
+.userbar{display:flex;align-items:center;justify-content:space-between;padding:8px 20px 14px}
+.userbar p{font-size:14px;color:#cbd5e1}
+.userbar b{color:#fff}
+.userbar .admin{color:#94a3b8}
+.pill{display:flex;align-items:center;background:#182028;border:1px solid #334155;border-radius:999px;padding:3px}
+.pill .darkbtn{display:flex;align-items:center;gap:6px;background:#232D38;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600}
+.pill .logout{padding:6px 12px;font-size:12px;color:#94a3b8}
+/* HERO */
+.hero{margin:4px 20px 14px;background:linear-gradient(135deg,#2A1A3A 0%,#1A1C29 55%,#131922 100%);border:1px solid rgba(129,140,248,0.25);border-radius:18px;padding:20px;position:relative;overflow:hidden}
+.hero span{font-size:11px;letter-spacing:1.5px;color:#A5B4FC;font-weight:700}
+.hero h2{font-size:26px;line-height:1.2;margin-top:8px;display:flex;align-items:center;gap:8px}
+.hero p{font-size:14px;color:#94A3B8;margin-top:6px}
+/* CARDS */
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:0 20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px;margin-top:10px}
+.stat{background:linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.14);border-radius:14px;padding:14px}
+.stat.low{border-color:rgba(99,102,241,0.55);box-shadow:0 0 18px rgba(99,102,241,0.35)}
+.stat .icon{width:32px;height:32px;margin-bottom:12px;opacity:.95}
+.stat label{font-size:12px;color:#CBD5E1;display:block}
+.stat b{font-size:22px;display:block;margin-top:2px}
+.stat b.red{color:#F87171}
+.sales-green{background:linear-gradient(135deg,#122B22,#141C24);border:1px solid rgba(52,211,153,0.25);border-radius:14px;padding:16px}
+.sales-green b{font-size:24px}
+.sales-green p{font-size:12px;color:#6EE7B7;margin-top:4px}
+.sales-grey{background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.13);border-radius:14px;padding:16px}
+.sales-grey b{font-size:24px}
+.sales-grey p{font-size:12px;color:#94A3B8;margin-top:4px}
+/* SEARCH + FORM */
+.search{margin:14px 20px 0;position:relative}
+.search svg{position:absolute;left:14px;top:13px;opacity:.6}
+.search input{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.13);border-radius:12px;padding:13px 14px 13px 42px;color:#fff;font-size:14px;outline:none}
+.search input::placeholder{color:#64748B}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:16px;margin:14px 20px 0}
+.card h3{display:flex;justify-content:space-between;align-items:center;font-size:16px}
+.card h3 span{font-size:12px;color:#94A3B8;font-weight:500}
+.card input,.card select{width:100%;background:#0F141A;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:12px 14px;color:#fff;font-size:14px;outline:none;margin-top:12px}
+.card input::placeholder{color:#64748B}
+.row{display:flex;gap:10px}
+.btn-main{width:100%;background:#4F46E5;color:#fff;font-weight:600;padding:12px;border-radius:12px;margin-top:12px;font-size:14px}
+.btn-green{flex:1;background:#059669;color:#fff;font-weight:700;padding:12px;border-radius:12px;font-size:14px}
+.btn-blue{background:#2563EB;color:#fff;font-weight:700;padding:10px 14px;border-radius:10px;font-size:13px}
+.btn-red{width:100%;background:rgba(239,68,68,0.12);color:#F87171;font-weight:700;padding:12px;border-radius:12px;font-size:13px;margin-top:10px}
+.btn-dark{width:100%;background:#1E293B;color:#fff;font-weight:700;padding:12px;border-radius:12px;font-size:13px;margin-top:10px}
+.list{padding:0 20px;margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.item{background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.item b{font-size:14px}
+.item small{font-size:12px;color:#94A3B8}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:34px;height:34px;border-radius:999px;background:rgba(255,255,255,0.12);font-weight:800;font-size:16px}
+.qty .plus{background:#fff;color:#0F172A}
+.qty .sell{background:#059669;color:#fff}
+.qty .del{color:#F87171;background:none;width:26px}
+/* SIDEBAR */
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:40;opacity:0;pointer-events:none;transition:.3s}
+#sidebar{position:fixed;top:0;left:0;bottom:0;z-index:50;width:288px;background:#111622;border-right:1px solid rgba(255,255,255,0.08);padding:20px;display:flex;flex-direction:column;justify-content:space-between;transform:translateX(-100%);transition:.3s}
+#sidebar.open{transform:translateX(0)}
+#overlay.show{opacity:1;pointer-events:auto}
+.side-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+.side-head h1{font-size:26px}
+.side-head button{font-size:22px;color:#94A3B8}
+.side-nav{display:flex;flex-direction:column;gap:8px}
+.side-nav button{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:12px;color:#CBD5E1;font-size:17px;text-align:left;width:100%}
+.side-nav button.active{background:rgba(30,41,59,0.7);border:1px solid rgba(99,102,241,0.5);box-shadow:0 0 20px rgba(99,102,241,0.2);color:#fff;font-weight:600}
+.side-nav button.logout{color:#CBD5E1}
+.side-nav svg{width:24px;height:24px;flex-shrink:0}
+.profile{background:#161C2C;border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:16px;text-align:center}
+.profile img{width:56px;height:56px;border-radius:999px;object-fit:cover;border:2px solid #334155}
+.profile .initial{width:56px;height:56px;border-radius:999px;background:#4F46E5;display:none;align-items:center;justify-content:center;font-weight:800;font-size:22px;margin:0 auto}
+.profile h3{font-size:16px;margin-top:10px;line-height:1.4}
+.profile p{font-size:12px;color:#94A3B8;margin-top:8px;display:flex;justify-content:center;gap:6px;align-items:center}
+/* BOTTOM NAV */
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#121820;border-top:1px solid rgba(255,255,255,0.08);z-index:30}
+.bottom-inner{max-width:430px;margin:0 auto;display:flex;justify-content:space-around;padding:12px 24px}
+.bottom button{color:#64748B;padding:6px}
+.bottom button.active{color:#fff}
+.bottom svg{width:26px;height:26px}
+.view{display:none} .view.active{display:block}
+.section-title{padding:0 20px;font-size:22px;font-weight:800}
+.muted{color:#94A3B8;font-size:13px;padding:4px 20px 0}
+.staff-row{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.2);padding:10px 12px;border-radius:10px;margin-top:8px;font-size:13px}
+.alert{background:#EF4444;color:#fff;margin:10px 20px 0;padding:14px;border-radius:14px;display:flex;justify-content:space-between;font-weight:700;font-size:13px}
+.receipt{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:60;display:none;align-items:center;justify-content:center;padding:16px}
+.receipt.show{display:flex}
+.receipt-box{background:#fff;color:#0F172A;width:100%;max-width:360px;border-radius:20px;padding:22px}
 </style>
 <script>
 const saved = sessionStorage.getItem('stocksync_user');
 if(!saved){ window.location.replace('index.html'); }
 const user = saved ? JSON.parse(saved) : null;
 if(user && Date.now() - user.loginTime > 30*60*1000){ sessionStorage.removeItem('stocksync_user'); window.location.replace('index.html'); }
-history.pushState(null, null, location.href);
-window.onpopstate = function(){ history.pushState(null, null, location.href); };
 </script>
 </head>
-<body id="body" class="bg-[#0B0F17] text-slate-100 min-h-screen">
+<body>
 
-<div id="overlay" onclick="toggleMenu(false)" class="fixed inset-0 bg-black/60 z-40 opacity-0 pointer-events-none"></div>
+<div id="overlay" onclick="toggleMenu(false)"></div>
 
-<!-- ===== SIDEBAR - EXACTLY LIKE PHOTO 1 ===== -->
-<aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 glass-strong border-r border-slate-800/80 flex flex-col justify-between p-5 -translate-x-full">
+<!-- SIDEBAR -->
+<aside id="sidebar">
   <div>
-    <div class="flex items-center justify-between mb-8 px-1">
-      <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2"><img src="logo.png" class="w-8 h-8 rounded-lg object-cover bg-white p-0.5" onerror="this.style.display='none'">StockSync</h1>
-      <button onclick="toggleMenu(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-    </div>
-    <nav class="space-y-2">
-      <button id="nav-dashboard" onclick="showView('dashboard')" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl bg-slate-800/50 border border-indigo-500/40 text-white font-medium active-nav-glow"><i data-lucide="layout-grid" class="w-5 h-5 text-indigo-400"></i><span>Dashboard</span></button>
-      <button id="nav-products" onclick="showView('products')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40"><i data-lucide="package" class="w-5 h-5 text-slate-400"></i><span>Products</span></button>
-      <button id="nav-low" onclick="showView('low')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40"><i data-lucide="trending-down" class="w-5 h-5 text-slate-400"></i><span>Low Stock</span></button>
-      <button id="nav-sales" onclick="showView('sales')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40"><i data-lucide="badge-dollar-sign" class="w-5 h-5 text-slate-400"></i><span>Sales</span></button>
-      <button id="nav-report" onclick="showView('report')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40"><i data-lucide="bar-chart-2" class="w-5 h-5 text-slate-400"></i><span>Sales Report</span></button>
-      <button id="nav-settings" onclick="showView('settings')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40"><i data-lucide="settings" class="w-5 h-5 text-slate-400"></i><span>Settings</span></button>
-      <div class="pt-2"><button onclick="logout()" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-300 hover:text-rose-400 hover:bg-rose-500/10"><i data-lucide="log-out" class="w-5 h-5 text-slate-400"></i><span>Logout</span></button></div>
+    <div class="side-head"><h1>StockSync</h1><button onclick="toggleMenu(false)">✕</button></div>
+    <nav class="side-nav">
+      <button id="nav-dashboard" onclick="showView('dashboard')" class="active"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</button>
+      <button id="nav-products" onclick="showView('products')"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>Products</button>
+      <button id="nav-low" onclick="showView('low')"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Low Stock</button>
+      <button id="nav-sales" onclick="showView('sales')"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5c-.3-1-1.2-1.5-2.5-1.5-1.4 0-2.5.7-2.5 1.8 0 2.6 5 1.2 5 3.8 0 1.1-1.1 1.9-2.5 1.9-1.3 0-2.2-.6-2.5-1.5M12 6v12"/></svg>Sales</button>
+      <button id="nav-report" onclick="showView('report')"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Sales Report</button>
+      <button id="nav-settings" onclick="showView('settings')"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 01-4 0v-.09a1.7 1.7 0 00-1-1.55 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.7 1.7 0 004.6 15a1.7 1.7 0 00-1.55-1H3a2 2 0 010-4h.09a1.7 1.7 0 001.55-1 1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 012.83-2.83l.06.06A1.7 1.7 0 009.4 4.6a1.7 1.7 0 001-1.55V3a2 2 0 014 0v.09a1.7 1.7 0 001 1.55 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 012.83 2.83l-.06.06A1.7 1.7 0 0019.4 9a1.7 1.7 0 001.55 1H21a2 2 0 010 4h-.09a1.7 1.7 0 00-1.51 1z"/></svg>Settings</button>
+      <button onclick="logout()" class="logout"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout</button>
     </nav>
   </div>
-  <div class="bg-[#161C2C]/90 border border-slate-800/90 rounded-2xl p-4 text-center shadow-lg">
-    <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center overflow-hidden">
-      <img src="profile.jpg" class="w-full h-full object-cover" onerror="this.style.display='none';document.getElementById('avatarFallback').style.display='flex'">
-      <span id="avatarFallback" class="hidden w-full h-full items-center justify-center text-xl font-black bg-indigo-600 text-white">M</span>
-    </div>
-    <h2 class="text-base font-semibold text-white leading-snug"><span id="sidebarName">Mthokozisi</span><br><span id="sidebarRole" class="text-sm font-medium text-slate-300">(Admin)</span></h2>
-    <div class="mt-2.5 flex items-center justify-center gap-1.5 text-xs text-slate-400"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span id="syncStatus">Last sync: Never</span></div>
+  <div class="profile">
+    <img src="profile.jpg" onerror="this.style.display='none';document.getElementById('avatarFallback').style.display='flex'">
+    <div id="avatarFallback" class="initial">M</div>
+    <h3><span id="sidebarName">Mthokozisi</span><br>(<span id="sidebarRole">Admin</span>)</h3>
+    <p>🕒 <span id="syncStatus">Last sync: Never</span></p>
   </div>
 </aside>
 
-<!-- ===== MAIN - EXACTLY LIKE PHOTO 2 ===== -->
-<div class="w-full max-w-md mx-auto flex-1 flex flex-col pb-28">
-  <header class="flex items-center justify-between px-5 py-4">
-    <button onclick="toggleMenu(true)" class="text-slate-300 text-2xl">☰</button>
-    <span class="text-lg font-semibold tracking-tight text-white flex items-center gap-2"><img src="logo.png" class="w-7 h-7 rounded-lg object-cover bg-white p-0.5" onerror="this.style.display='none'">StockSync</span>
-    <span class="w-6"></span>
-  </header>
+<div class="wrap">
+  <div class="topbar"><button class="hamburger" onclick="toggleMenu(true)">☰</button><h1>StockSync</h1><span style="width:24px"></span></div>
+  <div class="userbar"><p>Hi <b id="hiName">Mthokozisi</b> <span style="color:#475569">•</span> <span class="admin" id="hiRole">Admin</span></p><div class="pill"><span class="darkbtn">🌙 Dark</span><button class="logout" onclick="logout()">Logout</button></div></div>
 
-  <div class="flex items-center justify-between px-5 py-2">
-    <p class="text-sm text-slate-300">Hi <span id="hiName" class="font-medium text-white">Mthokozisi</span> <span class="mx-1 text-slate-500">•</span> <span id="hiRole" class="text-slate-400">Admin</span></p>
-    <div class="inline-flex items-center glass rounded-full p-0.5 text-xs">
-      <button onclick="toggleDark()" id="darkBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#232d38] text-slate-200 font-medium">🌙 Dark</button>
-      <button onclick="logout()" class="px-3 py-1.5 text-slate-400 hover:text-white">Logout</button>
+  <div id="lowAlert" class="alert" style="display:none"><span id="lowAlertText"></span><button onclick="document.getElementById('lowAlert').style.display='none'" style="font-weight:800">✕</button></div>
+
+  <!-- DASHBOARD -->
+  <div id="view-dashboard" class="view active">
+    <div class="hero"><span>TODAY'S OVERVIEW</span><h2>Your shop at a glance <svg width="26" height="26" fill="none" stroke="#fff" stroke-width="1.7" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></h2><p>Keep track, sell more, stress less.</p></div>
+    <div class="grid3">
+      <div class="stat"><svg class="icon" fill="none" stroke="white" stroke-width="1.4" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg><label>Total Items</label><b id="totalItems">0</b></div>
+      <div class="stat"><svg class="icon" fill="none" stroke="white" stroke-width="1.4" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg><label>Total Qty</label><b id="totalQty">0</b></div>
+      <div class="stat low"><svg class="icon" fill="none" stroke="white" stroke-width="1.4" viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><label>Low Stock</label><b class="red" id="lowStock">0</b></div>
     </div>
+    <div class="grid2">
+      <div class="sales-green"><b id="dashSalesTotal">R 0.00</b><p>Total Sales</p></div>
+      <div class="sales-grey"><b id="dashSalesCount">0 sales</b><p>Sales</p></div>
+    </div>
+    <div class="search"><svg width="18" height="18" fill="none" stroke="#94A3B8" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="search" oninput="render()" placeholder="Search product... e.g. Coke"></div>
+    <div class="card" id="adminBox">
+      <h3>+ Add New Product <span>Admin Only</span></h3>
+      <input id="pName" placeholder="Product name - e.g. Coca-Cola 500ml">
+      <div class="row"><input id="pQty" type="number" placeholder="Qty"><input id="pPrice" type="number" placeholder="Price R"></div>
+      <div class="row"><input id="pBarcode" placeholder="Barcode (optional)" style="flex:1"><button onclick="scanBarcode()" class="btn-blue" style="margin-top:12px">📷 Scan</button></div>
+      <input id="barcodeInput" oninput="findByBarcode()" placeholder="🔍 Scan barcode to find / sell...">
+      <p id="barcodeMsg" style="font-size:12px;color:#94A3B8;margin-top:6px">Type barcode to find product.</p>
+      <button onclick="addProduct()" class="btn-main">Save Product</button>
+    </div>
+    <div id="viewerMsg" style="display:none;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#FCD34D;padding:14px;border-radius:14px;margin:14px 20px 0;font-size:13px">👀 You are a Viewer — you can only view stock.</div>
+    <div style="display:flex;justify-content:space-between;padding:14px 20px 0"><b>Your Products</b><span style="font-size:12px;color:#94A3B8">Tap + / - • 💰 to sell</span></div>
+    <div id="list" class="list"></div>
   </div>
 
-  <div id="lowAlert" class="hidden mx-5 mt-3 bg-red-500 text-white p-4 rounded-2xl flex justify-between items-center"><span id="lowAlertText" class="font-bold text-sm"></span><button onclick="document.getElementById('lowAlert').classList.add('hidden')" class="font-black">×</button></div>
-
-  <main class="px-5 space-y-4 mt-3">
-    <div id="view-dashboard" class="space-y-4">
-      <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#231d35] via-[#1a1c29] to-[#131922] border border-indigo-500/20 p-5 shadow-lg">
-        <span class="text-[11px] font-semibold tracking-wider uppercase text-indigo-300/80">Today's Overview</span>
-        <h1 class="mt-1.5 text-2xl font-semibold text-white flex items-center gap-2">Your shop at a glance <span class="text-xl">👁️</span></h1>
-        <p class="mt-1 text-sm text-slate-400">Keep track, sell more, stress less.</p>
-        <div class="absolute -top-12 -right-12 w-36 h-36 bg-indigo-500/10 rounded-full blur-2xl"></div>
-      </section>
-
-      <section class="grid grid-cols-3 gap-3">
-        <div class="glass rounded-2xl p-3.5"><div class="text-2xl mb-2">📦</div><p class="text-xs text-slate-300">Total Items</p><p id="totalItems" class="mt-0.5 text-xl font-bold text-white">0</p></div>
-        <div class="glass rounded-2xl p-3.5"><div class="text-2xl mb-2">🔢</div><p class="text-xs text-slate-300">Total Qty</p><p id="totalQty" class="mt-0.5 text-xl font-bold text-white">0</p></div>
-        <div class="glass rounded-2xl p-3.5"><div class="text-2xl mb-2">⚠️</div><p class="text-xs text-slate-300">Low Stock</p><p id="lowStock" class="mt-0.5 text-xl font-bold text-red-500">0</p></div>
-      </section>
-
-      <section class="grid grid-cols-2 gap-3">
-        <div class="rounded-2xl p-4 bg-gradient-to-br from-[#122b22] to-[#141c24] border border-emerald-500/20"><p id="dashSalesTotal" class="text-2xl font-bold text-white">R 0.00</p><p class="mt-1 text-xs text-emerald-300/80">Total Sales</p></div>
-        <div class="glass rounded-2xl p-4"><p id="dashSalesCount" class="text-2xl font-bold text-white">0 sales</p><p class="mt-1 text-xs text-slate-400">Sales</p></div>
-      </section>
-
-      <section class="relative"><span class="absolute left-3.5 top-3.5 text-slate-400">🔍</span><input id="search" oninput="render()" type="text" placeholder="Search product... e.g. Coke" class="dark-input w-full glass rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-slate-500 outline-none"></section>
-
-      <section id="adminBox" class="glass rounded-2xl p-4 space-y-3.5">
-        <div class="flex items-center justify-between"><h2 class="text-base font-semibold text-white">+ Add New Product</h2><span class="text-xs font-medium text-slate-400">Admin Only</span></div>
-        <input id="pName" type="text" placeholder="Product name - e.g. Coca-Cola 500ml" class="dark-input w-full bg-[#0f141a]/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none">
-        <div class="grid grid-cols-2 gap-3"><input id="pQty" type="number" placeholder="Qty" class="dark-input w-full bg-[#0f141a]/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none"><input id="pPrice" type="number" step="0.01" placeholder="Price R" class="dark-input w-full bg-[#0f141a]/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none"></div>
-        <div class="flex gap-3"><input id="pBarcode" placeholder="Barcode (optional)" class="dark-input flex-1 min-w-0 bg-[#0f141a]/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none"><button onclick="scanBarcode()" type="button" class="bg-slate-800 px-4 rounded-xl text-sm font-bold shrink-0">📷 Scan</button></div>
-        <input id="barcodeInput" oninput="findByBarcode()" placeholder="🔍 Scan barcode to find / sell..." class="dark-input w-full bg-[#0f141a]/60 border border-dashed border-indigo-500/50 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none">
-        <p id="barcodeMsg" class="text-xs text-slate-400">Type barcode to find product.</p>
-        <button onclick="addProduct()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm py-2.5 rounded-xl">Save Product</button>
-      </section>
-
-      <div id="viewerMsg" class="hidden bg-amber-500/10 border border-amber-500/30 text-amber-300 p-4 rounded-2xl text-sm">👀 You are a Viewer — you can only view stock.</div>
-      <div class="flex justify-between items-center px-1"><h3 class="font-bold">Your Products</h3><span class="text-xs text-slate-400">Tap + / - • 💰 to sell</span></div>
-      <div id="list" class="space-y-3"></div>
+  <!-- PRODUCTS -->
+  <div id="view-products" class="view"><div class="section-title">📦 All Products</div><div class="list" id="list-products"></div></div>
+  <!-- LOW -->
+  <div id="view-low" class="view"><div class="section-title">📉 Low Stock</div><div class="muted">Below <b id="lowLabel" style="color:#F87171">5</b> items.</div><div class="list" id="list-low"></div></div>
+  <!-- SALES -->
+  <div id="view-sales" class="view"><div class="section-title">💰 Sales</div>
+    <div class="grid2"><div class="sales-green"><b id="salesTotal">R 0.00</b><p>Total Made</p></div><div class="sales-grey"><b id="salesCount">0</b><p>Total Sales</p></div></div>
+    <div class="card"><h3>🧾 Make a Sale</h3><select id="saleProduct"></select><div class="row"><input id="saleQty" type="number" value="1" min="1" style="flex:1"><button onclick="makeSale()" class="btn-green" style="margin-top:12px">Sell Now 💰</button></div><p id="saleMsg" style="font-size:12px;color:#94A3B8;margin-top:8px">Stock goes down automatically.</p></div>
+    <div class="list" id="list-sales"></div>
+    <div style="padding:0 20px"><button onclick="clearSales()" class="btn-red">Clear Sales History</button></div>
+  </div>
+  <!-- REPORT -->
+  <div id="view-report" class="view"><div class="section-title">📊 Sales Report</div>
+    <div style="display:flex;gap:8px;padding:14px 20px 0"><button onclick="setReport('today')" id="rep-today" class="btn-blue" style="flex:1">Today</button><button onclick="setReport('week')" id="rep-week" class="btn-dark" style="flex:1">Week</button><button onclick="setReport('month')" id="rep-month" class="btn-dark" style="flex:1">Month</button></div>
+    <div class="card"><p style="font-size:13px;color:#94A3B8">Revenue</p><p id="repTotal" style="font-size:30px;font-weight:800">R 0.00</p><p id="repCount" style="font-size:13px;color:#94A3B8">0 sales</p><p style="font-weight:700;margin-top:14px">🏆 Best Seller:</p><p id="repBest" style="color:#34D399;font-weight:700">No sales yet</p></div>
+    <div class="list" id="list-report"></div>
+  </div>
+  <!-- SETTINGS -->
+  <div id="view-settings" class="view"><div class="section-title">⚙️ Settings</div>
+    <div class="card" style="display:flex;flex-direction:column;gap:20px">
+      <div><b>👤 Logged in as</b><p id="settingsUser" style="color:#94A3B8;font-size:13px;margin-top:4px"></p><p id="settingsShop" style="color:#64748B;font-size:12px"></p></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:16px"><b>🔑 Change Password</b><select id="passRole"><option>Admin</option><option>Viewer</option><option>Cashier</option></select><input id="newPass" placeholder="New password"><button onclick="changePassword()" class="btn-blue">Save New Password</button></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:16px"><b>👥 Staff - Add / Remove</b><input id="staffName" placeholder="Staff name - e.g. Lerato"><div class="row"><select id="staffRole"><option>Cashier</option><option>Viewer</option><option>Admin</option></select><input id="staffPass" placeholder="Password"></div><button onclick="addStaff()" class="btn-blue" style="background:#2563EB">+ Add Staff</button><div id="staffList"></div></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:16px"><b>🏪 Shop Name</b><input id="shopName"><button onclick="saveShopName()" class="btn-blue">Save Shop Name</button></div>
+      <div><b>⚠️ Low Stock Alert At</b><div class="row"><input id="lowThreshold" type="number" style="flex:1"><button onclick="saveThreshold()" class="btn-blue" style="margin-top:12px">Save</button></div><label style="display:flex;gap:8px;margin-top:10px;font-size:13px"><input type="checkbox" id="alertToggle" checked onchange="saveAlertToggle()" style="width:auto;margin:0"> Show Low Stock popup</label></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:16px"><b>📷 Barcode Scanner</b><button onclick="scanBarcode()" class="btn-dark">📷 Open Camera Scanner</button><p id="barcodeStatus" style="font-size:12px;color:#94A3B8;margin-top:6px"></p></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:16px"><b>💾 Backup / Export</b><button onclick="exportCSV()" class="btn-green" style="width:100%;margin-top:10px">📊 Export to Excel (CSV)</button><button onclick="backupJSON()" class="btn-dark">☁️ Download Full Backup</button><label style="display:block;margin-top:12px;font-size:13px;font-weight:700">Restore Backup:</label><input type="file" id="restoreFile" accept=".json" onchange="restoreJSON(event)"></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:16px"><b>☁️ Cloud Sync</b><button onclick="cloudSync()" class="btn-blue">Sync Now</button><p id="cloudMsg" style="font-size:12px;color:#34D399;font-weight:700;margin-top:6px"></p></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:16px"><b style="color:#F87171">Danger Zone</b><button onclick="clearAllProducts()" class="btn-red">🗑️ Delete All Products</button><button onclick="clearAllData()" style="width:100%;background:#DC2626;color:#fff;font-weight:700;padding:12px;border-radius:12px;font-size:13px;margin-top:8px">Reset Everything</button></div>
     </div>
-
-    <div id="view-products" class="hidden space-y-3"><h2 class="text-2xl font-bold">📦 All Products</h2><div id="list-products" class="space-y-3"></div></div>
-    <div id="view-low" class="hidden space-y-3"><h2 class="text-2xl font-bold">📉 Low Stock</h2><p class="text-slate-400 text-sm">Below <span id="lowLabel" class="font-bold text-red-500">5</span> items.</p><div id="list-low" class="space-y-3"></div></div>
-    <div id="view-sales" class="hidden space-y-3">
-      <h2 class="text-2xl font-bold">💰 Sales</h2>
-      <div class="grid grid-cols-2 gap-3"><div class="bg-emerald-600/20 border border-emerald-500/30 p-4 rounded-2xl"><p id="salesTotal" class="text-xl font-black">R 0.00</p><p class="text-xs text-emerald-300">Total Made</p></div><div class="glass p-4 rounded-2xl"><p id="salesCount" class="text-xl font-black">0</p><p class="text-xs text-slate-400">Total Sales</p></div></div>
-      <div class="glass rounded-2xl p-4 space-y-3"><h3 class="font-bold">🧾 Make a Sale</h3><select id="saleProduct" class="dark-input w-full bg-[#0f141a] border border-white/10 rounded-xl p-3 text-sm"></select><div class="flex gap-3"><input id="saleQty" type="number" value="1" min="1" class="dark-input flex-1 bg-[#0f141a] border border-white/10 rounded-xl p-3"><button onclick="makeSale()" class="flex-1 bg-emerald-600 font-bold rounded-xl text-sm">Sell Now 💰</button></div><p id="saleMsg" class="text-xs text-slate-400">Stock goes down automatically.</p></div>
-      <div id="list-sales" class="space-y-3"></div>
-      <button onclick="clearSales()" class="w-full bg-red-500/10 text-red-400 font-bold py-3 rounded-xl text-sm">Clear Sales History</button>
-    </div>
-    <div id="view-report" class="hidden space-y-3">
-      <h2 class="text-2xl font-bold">📊 Sales Report</h2>
-      <div class="flex gap-2"><button onclick="setReport('today')" id="rep-today" class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-sm">Today</button><button onclick="setReport('week')" id="rep-week" class="flex-1 glass font-bold py-2.5 rounded-xl text-sm">Week</button><button onclick="setReport('month')" id="rep-month" class="flex-1 glass font-bold py-2.5 rounded-xl text-sm">Month</button></div>
-      <div class="glass p-5 rounded-2xl"><p class="text-sm text-slate-400">Revenue</p><p id="repTotal" class="text-3xl font-black">R 0.00</p><p id="repCount" class="text-sm text-slate-400">0 sales</p><p class="font-bold mt-4">🏆 Best Seller:</p><p id="repBest" class="text-emerald-400 font-bold">No sales yet</p></div>
-      <div id="list-report" class="space-y-3"></div>
-    </div>
-    <div id="view-settings" class="hidden space-y-3">
-      <h2 class="text-2xl font-bold">⚙️ Settings</h2>
-      <div class="glass rounded-2xl p-4 space-y-6">
-        <div><p class="font-bold">👤 Logged in as</p><p id="settingsUser" class="text-slate-400 text-sm"></p><p id="settingsShop" class="text-xs text-slate-500"></p></div>
-        <div class="border-t border-white/10 pt-5"><p class="font-bold">🔑 Change Password</p><select id="passRole" class="dark-input w-full bg-[#0f141a] border border-white/10 rounded-xl p-3 mt-2 text-sm"><option>Admin</option><option>Viewer</option><option>Cashier</option></select><input id="newPass" placeholder="New password" class="dark-input w-full bg-[#0f141a] border border-white/10 rounded-xl p-3 mt-2 text-sm"><button onclick="changePassword()" class="mt-2 bg-indigo-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Save New Password</button></div>
-        <div class="border-t border-white/10 pt-5"><p class="font-bold">👥 Staff - Add / Remove</p><input id="staffName" placeholder="Staff name - e.g. Lerato" class="dark-input w-full bg-[#0f141a] border border-white/10 rounded-xl p-3 mt-2 text-sm"><div class="flex gap-2 mt-2"><select id="staffRole" class="dark-input flex-1 bg-[#0f141a] border border-white/10 rounded-xl p-3 text-sm"><option>Cashier</option><option>Viewer</option><option>Admin</option></select><input id="staffPass" placeholder="Password" class="dark-input flex-1 bg-[#0f141a] border border-white/10 rounded-xl p-3 text-sm"></div><button onclick="addStaff()" class="mt-2 bg-blue-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">+ Add Staff</button><div id="staffList" class="mt-3 space-y-2"></div></div>
-        <div class="border-t border-white/10 pt-5"><p class="font-bold">🏪 Shop Name</p><input id="shopName" class="dark-input w-full bg-[#0f141a] border border-white/10 rounded-xl p-3 mt-2 text-sm"><button onclick="saveShopName()" class="mt-2 bg-indigo-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Save Shop Name</button></div>
-        <div><p class="font-bold">⚠️ Low Stock Alert At</p><div class="flex gap-2 mt-2"><input id="lowThreshold" type="number" class="dark-input flex-1 bg-[#0f141a] border border-white/10 rounded-xl p-3 text-sm"><button onclick="saveThreshold()" class="bg-blue-600 text-white font-bold text-sm px-4 rounded-xl">Save</button></div><label class="flex gap-2 mt-3 text-sm"><input id="alertToggle" type="checkbox" checked onchange="saveAlertToggle()"> Show Low Stock popup + sound</label></div>
-        <div class="border-t border-white/10 pt-5"><p class="font-bold">🌙 Appearance</p><button onclick="toggleDark()" class="mt-2 bg-slate-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Toggle Dark / Light</button><p class="text-xs text-slate-400 mt-1">Current: <span id="modeLabel">Dark</span></p></div>
-        <div class="border-t border-white/10 pt-5"><p class="font-bold">📷 Barcode Scanner</p><button onclick="scanBarcode()" class="mt-2 bg-slate-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl">📷 Open Camera Scanner</button><p id="barcodeStatus" class="text-xs mt-1 text-slate-400"></p></div>
-        <div class="border-t border-white/10 pt-5"><p class="font-bold">💾 Backup / Export</p><button onclick="exportCSV()" class="w-full mt-2 bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm">📊 Export to Excel (CSV)</button><button onclick="backupJSON()" class="w-full mt-2 bg-slate-800 text-white font-bold py-3 rounded-xl text-sm">☁️ Download Full Backup</button><label class="block mt-3 text-sm font-bold">Restore Backup:</label><input type="file" id="restoreFile" accept=".json" onchange="restoreJSON(event)" class="w-full text-sm mt-1"></div>
-        <div class="border-t border-white/10 pt-5"><p class="font-bold">☁️ Cloud Sync</p><button onclick="cloudSync()" class="mt-2 bg-blue-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Sync Now</button><p id="cloudMsg" class="text-xs text-emerald-400 font-bold mt-1"></p></div>
-        <div class="border-t border-white/10 pt-5"><p class="font-bold text-red-400">Danger Zone</p><button onclick="clearAllProducts()" class="w-full mt-3 bg-red-500/10 text-red-400 font-bold py-3 rounded-xl text-sm">🗑️ Delete All Products</button><button onclick="clearAllData()" class="w-full mt-2 bg-red-600 text-white font-bold py-3 rounded-xl text-sm">Reset Everything</button></div>
-      </div>
-    </div>
-  </main>
+  </div>
 </div>
 
-<!-- Bottom Nav - LIKE PHOTO 2 -->
-<nav class="fixed bottom-0 inset-x-0 bg-[#121820]/95 backdrop-blur-md border-t border-slate-800/90 z-40"><div class="max-w-md mx-auto flex items-center justify-around py-3 px-6"><button onclick="showView('dashboard')" class="text-white p-2">🏠</button><button onclick="showView('products')" class="text-slate-400 p-2">🔍</button><button onclick="showView('sales')" class="text-slate-400 p-2">⊞</button><button onclick="showView('settings')" class="text-slate-400 p-2">👤</button></div></nav>
+<!-- BOTTOM NAV -->
+<nav class="bottom"><div class="bottom-inner">
+  <button onclick="showView('dashboard')" id="bn-dashboard" class="active"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1h-5v-7h-6v7H5a1 1 0 01-1-1z"/></svg></button>
+  <button onclick="showView('products')" id="bn-products"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+  <button onclick="showView('sales')" id="bn-sales"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
+  <button onclick="showView('settings')" id="bn-settings"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></button>
+</div></nav>
 
-<div id="receiptModal" class="hidden fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4"><div class="bg-white text-slate-900 w-full max-w-sm rounded-[24px] p-6"><h3 class="font-black text-center">🧾 StockSync Receipt</h3><p id="receiptShop" class="text-center text-xs text-slate-400"></p><div class="border-t border-dashed my-3"></div><div id="receiptBody" class="text-sm space-y-1"></div><div class="border-t border-dashed my-3"></div><p id="receiptTotal" class="font-black text-right"></p><p class="text-center text-xs text-slate-400 mt-2">Thank you! 🙏</p><div class="flex gap-2 mt-4"><button onclick="shareReceipt()" class="flex-1 bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm">Share on WhatsApp</button><button onclick="closeReceipt()" class="flex-1 bg-slate-100 font-bold py-3 rounded-xl text-sm">Close</button></div></div></div>
+<div id="receiptModal" class="receipt"><div class="receipt-box"><h3 style="text-align:center">🧾 StockSync Receipt</h3><p id="receiptShop" style="text-align:center;font-size:12px;color:#64748B"></p><div style="border-top:1px dashed #CBD5E1;margin:12px 0"></div><div id="receiptBody" style="font-size:14px"></div><div style="border-top:1px dashed #CBD5E1;margin:12px 0"></div><p id="receiptTotal" style="font-weight:800;text-align:right"></p><p style="text-align:center;font-size:12px;color:#64748B;margin-top:8px">Thank you! 🙏</p><div style="display:flex;gap:8px;margin-top:14px"><button onclick="shareReceipt()" class="btn-green" style="margin:0">Share on WhatsApp</button><button onclick="closeReceipt()" style="flex:1;background:#F1F5F9;font-weight:700;padding:12px;border-radius:12px">Close</button></div></div></div>
 
 <script>
 let products = JSON.parse(localStorage.getItem('stocksync_products') || '[]');
 let sales = JSON.parse(localStorage.getItem('stocksync_sales') || '[]');
-let settings = JSON.parse(localStorage.getItem('stocksync_settings') || '{"threshold":5,"shopName":"","alert":true,"dark":true,"lastSync":""}');
+let settings = JSON.parse(localStorage.getItem('stocksync_settings') || '{"threshold":5,"shopName":"","alert":true,"lastSync":""}');
 let users = JSON.parse(localStorage.getItem('stocksync_users') || '[{"name":"Thabo","role":"Admin","pass":"admin123"},{"name":"Viewer","role":"Viewer","pass":"view123"},{"name":"Cashier","role":"Cashier","pass":"cash123"}]');
 let currentView='dashboard', reportPeriod='today', lastReceipt=null;
 document.getElementById('hiName').textContent = user.name; document.getElementById('hiRole').textContent = user.role;
-document.getElementById('sidebarName').textContent = user.name; document.getElementById('sidebarRole').textContent = `(${user.role})`;
+document.getElementById('sidebarName').textContent = user.name; document.getElementById('sidebarRole').textContent = user.role;
 document.getElementById('settingsUser').textContent = `${user.name} (${user.role})`;
 document.getElementById('avatarFallback').textContent = user.name.charAt(0).toUpperCase();
 document.getElementById('shopName').value = settings.shopName || ''; document.getElementById('lowThreshold').value = settings.threshold || 5; document.getElementById('lowLabel').textContent = settings.threshold || 5; document.getElementById('alertToggle').checked = settings.alert !== false;
-if(settings.dark===false) applyDark(false); else applyDark(true);
 if(settings.lastSync) document.getElementById('syncStatus').textContent = 'Last sync: ' + settings.lastSync;
-if(user.role!=='Admin'){ document.getElementById('adminBox').style.display='none'; document.getElementById('viewerMsg').classList.remove('hidden'); }
+if(user.role!=='Admin'){ document.getElementById('adminBox').style.display='none'; document.getElementById('viewerMsg').style.display='block'; }
 function getThreshold(){ return parseInt(settings.threshold)||5; }
-function toggleMenu(o){ const sb=document.getElementById('sidebar'), ov=document.getElementById('overlay'); if(o){sb.classList.remove('-translate-x-full'); ov.classList.remove('opacity-0','pointer-events-none');} else {sb.classList.add('-translate-x-full'); ov.classList.add('opacity-0','pointer-events-none');} }
-function showView(v){ toggleMenu(false); currentView=v; ['dashboard','products','low','sales','report','settings'].forEach(x=>{ document.getElementById('view-'+x).classList.add('hidden'); const n=document.getElementById('nav-'+x); n.classList.remove('bg-slate-800/50','border','border-indigo-500/40','active-nav-glow'); }); document.getElementById('view-'+v).classList.remove('hidden'); const nav=document.getElementById('nav-'+v); nav.classList.add('bg-slate-800/50','border','border-indigo-500/40','active-nav-glow'); window.scrollTo({top:0,behavior:'smooth'}); render(); }
+function toggleMenu(o){ document.getElementById('sidebar').classList.toggle('open',o); document.getElementById('overlay').classList.toggle('show',o); }
+function showView(v){ toggleMenu(false); currentView=v; ['dashboard','products','low','sales','report','settings'].forEach(x=>{ document.getElementById('view-'+x).classList.remove('active'); document.getElementById('nav-'+x).classList.remove('active'); }); document.getElementById('view-'+v).classList.add('active'); document.getElementById('nav-'+v).classList.add('active'); ['dashboard','products','sales','settings'].forEach(x=>{ const b=document.getElementById('bn-'+x); if(b) b.classList.remove('active'); }); const bn=document.getElementById('bn-'+v); if(bn) bn.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); render(); }
 function saveProducts(){ localStorage.setItem('stocksync_products', JSON.stringify(products)); render(); }
 function saveSales(){ localStorage.setItem('stocksync_sales', JSON.stringify(sales)); render(); }
 function saveSettings(){ localStorage.setItem('stocksync_settings', JSON.stringify(settings)); render(); }
 function saveUsers(){ localStorage.setItem('stocksync_users', JSON.stringify(users)); render(); }
-function applyDark(on){ const b=document.getElementById('body'); if(on){ b.classList.remove('light-mode'); document.getElementById('modeLabel').textContent='Dark'; document.getElementById('darkBtn').textContent='🌙 Dark'; } else { b.classList.add('light-mode'); document.getElementById('modeLabel').textContent='Light'; document.getElementById('darkBtn').textContent='☀️ Light'; } }
-function toggleDark(){ settings.dark = !settings.dark; applyDark(settings.dark); saveSettings(); }
 function addProduct(){ if(user.role!=='Admin') return alert('Viewers cannot add'); const name=document.getElementById('pName').value.trim(); const qty=parseInt(document.getElementById('pQty').value); const price=parseFloat(document.getElementById('pPrice').value)||0; const barcode=document.getElementById('pBarcode').value.trim(); if(!name||isNaN(qty)) return alert('Enter name and qty'); products.push({id:Date.now(), name, qty, price, barcode}); ['pName','pQty','pPrice','pBarcode'].forEach(id=>document.getElementById(id).value=''); saveProducts(); }
 function del(id){ if(user.role!=='Admin') return; if(confirm('Delete?')){ products=products.filter(p=>p.id!==id); saveProducts(); } }
 function changeQty(id,a){ if(user.role!=='Admin') return; const p=products.find(x=>x.id===id); p.qty=Math.max(0,p.qty+a); saveProducts(); }
-function findByBarcode(){ const code=document.getElementById('barcodeInput').value.trim(); if(!code) return; const p=products.find(x=>x.barcode===code); document.getElementById('barcodeMsg').textContent = p ? `✅ Found: ${p.name} - R ${p.price.toFixed(2)} (${p.qty} left)` : `❌ No product with barcode ${code}`; document.getElementById('barcodeMsg').className='text-xs font-bold ' + (p?'text-emerald-400':'text-red-400'); }
-async function scanBarcode(){ document.getElementById('barcodeStatus').textContent='Opening camera...'; if(!('BarcodeDetector' in window)){ const c=prompt('Enter barcode:'); if(c){ document.getElementById('pBarcode').value=c; document.getElementById('barcodeInput').value=c; findByBarcode(); } return; } try{ const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); const video=document.createElement('video'); video.srcObject=stream; await video.play(); const detector=new BarcodeDetector({formats:['ean_13','ean_8','code_128','upc_a','qr_code']}); const interval=setInterval(async()=>{ try{ const codes=await detector.detect(video); if(codes.length){ clearInterval(interval); stream.getTracks().forEach(t=>t.stop()); const val=codes[0].rawValue; document.getElementById('pBarcode').value=val; document.getElementById('barcodeInput').value=val; document.getElementById('barcodeStatus').textContent='✅ Scanned: '+val; findByBarcode(); } }catch(e){} },500); setTimeout(()=>{ clearInterval(interval); stream.getTracks().forEach(t=>t.stop()); },15000); }catch(e){ document.getElementById('barcodeStatus').textContent='Camera blocked. Type barcode manually.'; } }
+function findByBarcode(){ const code=document.getElementById('barcodeInput').value.trim(); if(!code) return; const p=products.find(x=>x.barcode===code); document.getElementById('barcodeMsg').textContent = p ? `✅ Found: ${p.name} - R ${p.price.toFixed(2)} (${p.qty} left)` : `❌ No product with barcode ${code}`; document.getElementById('barcodeMsg').style.color = p?'#34D399':'#F87171'; }
+async function scanBarcode(){ const el=document.getElementById('barcodeStatus'); if(el) el.textContent='Opening camera...'; if(!('BarcodeDetector' in window)){ const c=prompt('Enter barcode:'); if(c){ document.getElementById('pBarcode').value=c; document.getElementById('barcodeInput').value=c; findByBarcode(); } return; } try{ const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); const video=document.createElement('video'); video.srcObject=stream; await video.play(); const detector=new BarcodeDetector({formats:['ean_13','ean_8','code_128','upc_a','qr_code']}); const interval=setInterval(async()=>{ try{ const codes=await detector.detect(video); if(codes.length){ clearInterval(interval); stream.getTracks().forEach(t=>t.stop()); const val=codes[0].rawValue; document.getElementById('pBarcode').value=val; document.getElementById('barcodeInput').value=val; if(el) el.textContent='✅ Scanned: '+val; findByBarcode(); } }catch(e){} },500); setTimeout(()=>{ clearInterval(interval); stream.getTracks().forEach(t=>t.stop()); },15000); }catch(e){ if(el) el.textContent='Camera blocked. Type barcode manually.'; } }
 function makeSale(){ if(user.role==='Viewer') return alert('Viewers cannot sell'); const pid=parseInt(document.getElementById('saleProduct').value); const qty=parseInt(document.getElementById('saleQty').value)||1; const p=products.find(x=>x.id===pid); if(!p) return alert('Choose product'); if(p.qty<qty) return alert(`Only ${p.qty} left`); p.qty-=qty; const total=qty*p.price; const sale={id:Date.now(), name:p.name, qty, price:p.price, total, date:new Date().toLocaleString(), ts:Date.now()}; sales.unshift(sale); showReceipt(sale); saveProducts(); saveSales(); }
 function sellOne(id){ const p=products.find(x=>x.id===id); if(!p||p.qty<=0) return alert('Out of stock'); if(user.role==='Viewer') return alert('Viewers cannot sell'); p.qty-=1; const sale={id:Date.now(), name:p.name, qty:1, price:p.price, total:p.price, date:new Date().toLocaleString(), ts:Date.now()}; sales.unshift(sale); showReceipt(sale); saveProducts(); saveSales(); }
-function showReceipt(s){ lastReceipt=s; document.getElementById('receiptShop').textContent=settings.shopName||'StockSync'; document.getElementById('receiptBody').innerHTML=`<p>${s.name}</p><p class="text-slate-500">${s.qty} x R ${s.price.toFixed(2)} • ${s.date}</p><p class="text-slate-500">Sold by: ${user.name}</p>`; document.getElementById('receiptTotal').textContent='Total: R '+s.total.toFixed(2); document.getElementById('receiptModal').classList.remove('hidden'); }
-function closeReceipt(){ document.getElementById('receiptModal').classList.add('hidden'); }
+function showReceipt(s){ lastReceipt=s; document.getElementById('receiptShop').textContent=settings.shopName||'StockSync'; document.getElementById('receiptBody').innerHTML=`<p>${s.name}</p><p style="color:#64748B">${s.qty} x R ${s.price.toFixed(2)} • ${s.date}</p><p style="color:#64748B">Sold by: ${user.name}</p>`; document.getElementById('receiptTotal').textContent='Total: R '+s.total.toFixed(2); document.getElementById('receiptModal').classList.add('show'); }
+function closeReceipt(){ document.getElementById('receiptModal').classList.remove('show'); }
 function shareReceipt(){ if(!lastReceipt) return; const text=`🧾 StockSync Receipt\n${settings.shopName||'StockSync'}\n\n${lastReceipt.name}\n${lastReceipt.qty} x R ${lastReceipt.price.toFixed(2)}\nTotal: R ${lastReceipt.total.toFixed(2)}\nDate: ${lastReceipt.date}\n\nThank you! 🙏`; window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank'); }
 function clearSales(){ if(confirm('Clear sales?')){ sales=[]; saveSales(); } }
 function changePassword(){ const role=document.getElementById('passRole').value; const np=document.getElementById('newPass').value.trim(); if(!np) return alert('Enter new password'); const u=users.find(x=>x.role===role); if(u) u.pass=np; else users.push({name:role, role, pass:np}); document.getElementById('newPass').value=''; saveUsers(); alert(`✅ ${role} password changed to: ${np}`); }
@@ -199,24 +254,23 @@ function exportCSV(){ let csv='Type,Name,Qty,Price,Total,Date\n'; products.forEa
 function backupJSON(){ const data={products, sales, settings, users, backedUpAt:new Date().toLocaleString()}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='stocksync-backup.json'; a.click(); alert('✅ Backup downloaded'); }
 function restoreJSON(e){ const file=e.target.files[0]; if(!file) return; const r=new FileReader(); r.onload=()=>{ try{ const d=JSON.parse(r.result); if(d.products) products=d.products; if(d.sales) sales=d.sales; if(d.settings) settings=d.settings; if(d.users) users=d.users; localStorage.setItem('stocksync_products',JSON.stringify(products)); localStorage.setItem('stocksync_sales',JSON.stringify(sales)); localStorage.setItem('stocksync_settings',JSON.stringify(settings)); localStorage.setItem('stocksync_users',JSON.stringify(users)); alert('✅ Restored!'); location.reload(); }catch(err){ alert('❌ Invalid file'); } }; r.readAsText(file); }
 function cloudSync(){ settings.lastSync=new Date().toLocaleString(); localStorage.setItem('stocksync_settings',JSON.stringify(settings)); document.getElementById('syncStatus').textContent='Last sync: '+settings.lastSync; document.getElementById('cloudMsg').textContent='✅ Synced at '+settings.lastSync; backupJSON(); }
-function setReport(p){ reportPeriod=p; ['today','week','month'].forEach(x=>{ document.getElementById('rep-'+x).className='flex-1 glass font-bold py-2.5 rounded-xl text-sm'; }); document.getElementById('rep-'+p).className='flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-sm'; render(); }
+function setReport(p){ reportPeriod=p; ['today','week','month'].forEach(x=>{ document.getElementById('rep-'+x).className='btn-dark'; document.getElementById('rep-'+x).style.flex='1'; }); document.getElementById('rep-'+p).className='btn-blue'; document.getElementById('rep-'+p).style.flex='1'; render(); }
 function getReportSales(){ const now=Date.now(); let cutoff=now; if(reportPeriod==='today') cutoff=now-24*60*60*1000; if(reportPeriod==='week') cutoff=now-7*24*60*60*1000; if(reportPeriod==='month') cutoff=now-30*24*60*60*1000; return sales.filter(s=>(s.ts||now)>=cutoff); }
-function productCard(p){ const th=getThreshold(); const isLow=p.qty<th; return `<div class="glass rounded-2xl p-4 flex justify-between items-center gap-3"><div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-11 h-11 bg-white/5 rounded-xl flex items-center justify-center shrink-0 text-lg">${isLow?'⚠️':'📦'}</div><div class="min-w-0 flex-1"><p class="font-bold text-white truncate">${p.name} ${p.barcode?`<span class="text-[11px] text-slate-400 font-normal">#${p.barcode}</span>`:''}</p><p class="text-[13px] text-slate-400 truncate">R ${p.price.toFixed(2)} • ${isLow?'<span class="text-red-400 font-bold">Low Stock - Restock!</span>':p.qty+' in stock'}</p><div class="w-28 h-1.5 bg-white/10 rounded-full mt-2 overflow-hidden"><div class="h-full ${isLow?'bg-red-500':'bg-emerald-500'}" style="width:${Math.min(100,p.qty*10)}%"></div></div></div></div><div class="flex items-center gap-1.5 shrink-0">${user.role==='Viewer'?`<span class="font-black bg-white/10 px-3 py-1.5 rounded-full text-sm">${p.qty}</span>`:`<button onclick="changeQty(${p.id},-1)" class="bg-white/10 w-9 h-9 rounded-full font-black">-</button><span class="font-black w-7 text-center">${p.qty}</span><button onclick="changeQty(${p.id},1)" class="bg-white text-slate-900 w-9 h-9 rounded-full font-black">+</button><button onclick="sellOne(${p.id})" class="bg-emerald-600 text-white w-9 h-9 rounded-full">💰</button><button onclick="del(${p.id})" class="text-red-400 font-bold ml-1">🗑️</button>`}</div></div>`; }
+function productCard(p){ const th=getThreshold(); const isLow=p.qty<th; return `<div class="item"><div style="min-width:0;flex:1"><b>${p.name} ${p.barcode?`<span style="font-size:11px;color:#94A3B8;font-weight:400">#${p.barcode}</span>`:''}</b><br><small>R ${p.price.toFixed(2)} • ${isLow?'<span style="color:#F87171;font-weight:700">Low Stock - Restock!</span>':p.qty+' in stock'}</small><div style="width:112px;height:6px;background:rgba(255,255,255,0.1);border-radius:999px;margin-top:8px;overflow:hidden"><div style="height:100%;background:${isLow?'#EF4444':'#10B981'};width:${Math.min(100,p.qty*10)}%"></div></div></div><div class="qty">${user.role==='Viewer'?`<b>${p.qty}</b>`:`<button onclick="changeQty(${p.id},-1)">-</button><b style="width:28px;text-align:center">${p.qty}</b><button class="plus" onclick="changeQty(${p.id},1)">+</button><button class="sell" onclick="sellOne(${p.id})">💰</button><button class="del" onclick="del(${p.id})">🗑️</button>`}</div></div>`; }
 function render(){
   const th=getThreshold(); const q=(document.getElementById('search').value||'').toLowerCase(); const filtered=products.filter(p=>p.name.toLowerCase().includes(q)); const lowFiltered=products.filter(p=>p.qty<th);
   document.getElementById('totalItems').textContent=products.length; document.getElementById('totalQty').textContent=products.reduce((a,b)=>a+b.qty,0); document.getElementById('lowStock').textContent=lowFiltered.length;
   const totalSales=sales.reduce((a,b)=>a+b.total,0); document.getElementById('dashSalesTotal').textContent=`R ${totalSales.toFixed(2)}`; document.getElementById('dashSalesCount').textContent=`${sales.length} sales`; document.getElementById('salesTotal').textContent=`R ${totalSales.toFixed(2)}`; document.getElementById('salesCount').textContent=sales.length;
-  const empty='<div class="glass rounded-2xl p-8 text-center"><p class="font-bold">No products yet</p><p class="text-slate-400 text-xs">Add your first product above.</p></div>';
+  const empty='<div class="card" style="text-align:center"><b>No products yet</b><p style="color:#94A3B8;font-size:12px;margin-top:4px">Add your first product above.</p></div>';
   document.getElementById('list').innerHTML=filtered.length?filtered.map(productCard).join(''):empty;
   document.getElementById('list-products').innerHTML=products.length?products.map(productCard).join(''):empty;
-  document.getElementById('list-low').innerHTML=lowFiltered.length?lowFiltered.map(productCard).join(''):'<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-8 text-center"><p class="font-bold">✅ All good!</p><p class="text-slate-400 text-xs">No low stock items.</p></div>';
-  if(settings.alert!==false && lowFiltered.length>0 && currentView==='dashboard'){ document.getElementById('lowAlert').classList.remove('hidden'); document.getElementById('lowAlertText').textContent=`⚠️ ${lowFiltered.length} low! ${lowFiltered.map(p=>p.name).join(', ')}`; } else { document.getElementById('lowAlert').classList.add('hidden'); }
+  document.getElementById('list-low').innerHTML=lowFiltered.length?lowFiltered.map(productCard).join(''):'<div class="card" style="text-align:center"><b>✅ All good!</b><p style="color:#94A3B8;font-size:12px">No low stock items.</p></div>';
+  if(settings.alert!==false && lowFiltered.length>0 && currentView==='dashboard'){ document.getElementById('lowAlert').style.display='flex'; document.getElementById('lowAlertText').textContent=`⚠️ ${lowFiltered.length} low! ${lowFiltered.map(p=>p.name).join(', ')}`; } else { document.getElementById('lowAlert').style.display='none'; }
   const sel=document.getElementById('saleProduct'); const cv=sel.value; sel.innerHTML=products.length?products.map(p=>`<option value="${p.id}">${p.name} - R ${p.price.toFixed(2)} (${p.qty} left)</option>`).join(''):'<option value="">No products yet</option>'; if(cv) sel.value=cv;
-  document.getElementById('list-sales').innerHTML=sales.length?sales.map(s=>`<div class="glass p-4 rounded-2xl flex justify-between gap-3"><div><p class="font-bold text-sm">${s.name}</p><p class="text-xs text-slate-400">${s.date} • ${s.qty} x R ${s.price.toFixed(2)}</p></div><span class="font-black text-emerald-400 shrink-0">R ${s.total.toFixed(2)}</span></div>`).join(''):'<div class="glass p-8 text-center">No sales yet</div>';
-  const rep=getReportSales(); const repTotal=rep.reduce((a,b)=>a+b.total,0); document.getElementById('repTotal').textContent=`R ${repTotal.toFixed(2)}`; document.getElementById('repCount').textContent=`${rep.length} sales`; const counts={}; rep.forEach(s=>counts[s.name]=(counts[s.name]||0)+s.qty); const best=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]; document.getElementById('repBest').textContent=best?`${best[0]} - ${best[1]} sold`:'No sales yet'; document.getElementById('list-report').innerHTML=rep.length?rep.map(s=>`<div class="glass p-4 rounded-2xl flex justify-between"><div><p class="font-bold text-sm">${s.name}</p><p class="text-xs text-slate-400">${s.date}</p></div><span class="font-black text-emerald-400">R ${s.total.toFixed(2)}</span></div>`).join(''):'<div class="glass p-6 text-center">No sales in this period</div>';
-  document.getElementById('staffList').innerHTML=users.map((u,i)=>`<div class="flex justify-between items-center bg-black/20 p-3 rounded-xl"><span class="text-sm font-bold">${u.name} <span class="text-xs text-slate-400 font-normal">(${u.role} • ${u.pass})</span></span><button onclick="removeStaff(${i})" class="text-red-400 font-bold text-sm">Remove</button></div>`).join('');
+  document.getElementById('list-sales').innerHTML=sales.length?sales.map(s=>`<div class="item"><div><b style="font-size:14px">${s.name}</b><br><small>${s.date} • ${s.qty} x R ${s.price.toFixed(2)}</small></div><b style="color:#34D399">R ${s.total.toFixed(2)}</b></div>`).join(''):'<div class="card" style="text-align:center">No sales yet</div>';
+  const rep=getReportSales(); const repTotal=rep.reduce((a,b)=>a+b.total,0); document.getElementById('repTotal').textContent=`R ${repTotal.toFixed(2)}`; document.getElementById('repCount').textContent=`${rep.length} sales`; const counts={}; rep.forEach(s=>counts[s.name]=(counts[s.name]||0)+s.qty); const best=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]; document.getElementById('repBest').textContent=best?`${best[0]} - ${best[1]} sold`:'No sales yet'; document.getElementById('list-report').innerHTML=rep.length?rep.map(s=>`<div class="item"><div><b style="font-size:14px">${s.name}</b><br><small>${s.date}</small></div><b style="color:#34D399">R ${s.total.toFixed(2)}</b></div>`).join(''):'<div class="card" style="text-align:center">No sales in this period</div>';
+  document.getElementById('staffList').innerHTML=users.map((u,i)=>`<div class="staff-row"><span><b>${u.name}</b> <span style="color:#94A3B8">(${u.role} • ${u.pass})</span></span><button onclick="removeStaff(${i})" style="color:#F87171;font-weight:700">Remove</button></div>`).join('');
   document.getElementById('settingsShop').textContent = settings.shopName ? `Shop: ${settings.shopName}` : '';
-  if(window.lucide) lucide.createIcons();
 }
 function logout(){ sessionStorage.removeItem('stocksync_user'); sessionStorage.clear(); window.location.replace('index.html'); }
 render();
