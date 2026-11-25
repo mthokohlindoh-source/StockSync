@@ -1,136 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StockSync — Login</title>
-  <link rel="preconnect" href="https://googleapis.com" />
-  <link rel="preconnect" href="https://gstatic.com" crossorigin />
-  <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif}
-    body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;background-color:#0b0f19;background-image:radial-gradient(circle at 20% 15%,rgba(28,126,138,0.22) 0%,transparent 45%),radial-gradient(circle at 80% 85%,rgba(79,70,229,0.2) 0%,transparent 45%);color:#f8fafc;transition:background .3s}
-    .theme{position:fixed;top:16px;right:16px;z-index:10;display:flex;align-items:center;gap:6px;background:rgba(23,30,46,0.72);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:600;color:#f8fafc;cursor:pointer}
-    .login-card{width:100%;max-width:400px;background:rgba(23,30,46,0.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:36px 28px 32px;box-shadow:0 24px 48px rgba(0,0,0,0.45)}
-    .logo-badge{width:68px;height:68px;margin:0 auto 20px;border-radius:18px;padding:2px;background:linear-gradient(135deg,#2dd4bf,#6366f1);box-shadow:0 8px 24px rgba(45,212,191,0.2)}
-    .logo-inner{width:100%;height:100%;background:#111827;border-radius:16px;display:flex;align-items:center;justify-content:center}
-    .header{text-align:center;margin-bottom:28px}
-    .header h1{font-size:1.85rem;font-weight:700;letter-spacing:-0.02em;color:#fff;margin-bottom:6px}
-    .header p{font-size:0.925rem;color:#94a3b8}
-    .form-group{margin-bottom:18px}
-    .form-group label{display:block;font-size:0.875rem;font-weight:600;color:#e2e8f0;margin-bottom:8px}
-    .input-wrapper{position:relative;display:flex;align-items:center}
-    .input-icon{position:absolute;left:14px;color:#94a3b8;pointer-events:none;display:flex;align-items:center}
-    .input-field{width:100%;height:48px;background:rgba(15,23,42,0.65);border:1px solid rgba(148,163,184,0.25);border-radius:12px;padding:0 16px 0 42px;font-size:0.95rem;color:#f8fafc;outline:none;transition:border-color .2s,box-shadow .2s;appearance:none}
-    .input-field::placeholder{color:#64748b}
-    .input-field:focus{border-color:#2dd4bf;box-shadow:0 0 0 3px rgba(45,212,191,0.15)}
-    select.input-field{padding-right:40px;cursor:pointer}
-    select.input-field option{color:#0F172A}
-    .select-chevron{position:absolute;right:14px;color:#94a3b8;pointer-events:none;display:flex}
-    .toggle-password{position:absolute;right:14px;background:none;border:none;color:#94a3b8;cursor:pointer;display:flex;align-items:center;padding:4px}
-    .toggle-password:hover{color:#e2e8f0}
-    .credentials-box{margin:20px 0 22px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,rgba(45,212,191,0.08),rgba(99,102,241,0.08));border:1px solid rgba(45,212,191,0.35);font-size:0.8rem;line-height:1.5;color:#cbd5e1;text-align:center}
-    .credentials-box strong{color:#f8fafc;font-weight:600}
-    .login-btn{width:100%;height:50px;border:none;border-radius:12px;background:linear-gradient(90deg,#2dd4bf 0%,#3b82f6 50%,#6366f1 100%);color:#0b0f19;font-size:1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 20px rgba(59,130,246,0.3);transition:transform .15s,opacity .2s}
-    .login-btn:hover{opacity:.94;transform:translateY(-1px)}
-    .login-btn:active{transform:translateY(0)}
-    .footer-tip{margin-top:20px;font-size:0.825rem;color:#94a3b8;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
-    .err{font-size:12px;color:#F87171;text-align:center;margin-top:10px;min-height:16px;font-weight:600}
-    /* LIGHT MODE - SAME GLASS, LIGHT */
-    body.light{background-color:#EEF2F7;background-image:radial-gradient(circle at 20% 15%,rgba(45,212,191,0.15) 0%,transparent 45%),radial-gradient(circle at 80% 85%,rgba(99,102,241,0.12) 0%,transparent 45%);color:#0F172A}
-    body.light .theme{background:rgba(255,255,255,0.8);border-color:#E2E8F0;color:#0F172A}
-    body.light .login-card{background:rgba(255,255,255,0.75);border-color:rgba(15,23,42,0.08);box-shadow:0 20px 40px rgba(15,23,42,0.08)}
-    body.light .header h1{color:#0F172A}
-    body.light .header p{color:#64748B}
-    body.light .form-group label{color:#334155}
-    body.light .input-field{background:#F8FAFC;border-color:#E2E8F0;color:#0F172A}
-    body.light .input-field::placeholder{color:#94A3B8}
-    body.light .credentials-box{color:#475569}
-    body.light .credentials-box strong{color:#0F172A}
-    body.light .footer-tip{color:#64748B}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StockSync – Manage your shop smartly</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at top center,#133b56 0%,#0b1320 55%,#070b14 100%);color:#f1f5f9;padding:20px;transition:background .3s}
+.theme{position:fixed;top:16px;right:16px;z-index:10;display:flex;align-items:center;gap:6px;background:rgba(23,33,47,0.78);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:600;color:#f1f5f9;cursor:pointer}
+.login-card{width:100%;max-width:390px;background:rgba(23,33,47,0.78);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:36px 24px 28px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.65);position:relative}
+.logo-wrap{width:84px;height:84px;margin:0 auto 16px;position:relative}
+.logo-box{width:84px;height:84px;border-radius:20px;background:linear-gradient(180deg,#1E3A5F,#0F172A);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);position:relative}
+.header{text-align:center;margin-bottom:22px}
+.header h1{font-size:32px;font-weight:800;letter-spacing:-0.5px}
+.header p{font-size:13px;color:#94A3B8;margin-top:4px}
+label{display:block;font-size:13px;font-weight:600;color:#CBD5E1;margin:14px 0 6px}
+.field{position:relative}
+.field svg{position:absolute;left:12px;top:13px;opacity:.7}
+.field input,.field select{width:100%;background:rgba(10,18,32,0.65);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:13px 40px 13px 38px;color:#fff;font-size:14px;outline:none}
+.field input::placeholder{color:#64748B}
+.field select{appearance:none}
+.field select option{color:#0F172A}
+.chevron{position:absolute;right:12px;top:13px;color:#94A3B8;pointer-events:none}
+.eye{position:absolute;right:10px;top:10px;background:none;border:none;color:#94A3B8;cursor:pointer}
+.hint{margin:16px 0;background:rgba(16,185,129,0.12);border:1px solid rgba(52,211,153,0.3);border-radius:10px;padding:10px 12px;font-size:11px;line-height:1.5;color:#A7F3D0;text-align:center}
+.btn{width:100%;background:linear-gradient(90deg,#0EA5E9,#2563EB);color:#fff;font-weight:700;font-size:15px;padding:13px;border:none;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:scale(0.98)}
+.tip{font-size:11px;color:#64748B;text-align:center;margin-top:14px}
+.err{font-size:12px;color:#F87171;text-align:center;margin-top:8px;min-height:16px;font-weight:600}
+/* LIGHT MODE */
+body.light{background:radial-gradient(circle at top center,#DBEAFE 0%,#EEF2F7 55%,#E2E8F0 100%);color:#0F172A}
+body.light .theme{background:rgba(255,255,255,0.8);border-color:#E2E8F0;color:#0F172A}
+body.light .login-card{background:rgba(255,255,255,0.75);border-color:rgba(15,23,42,0.08);box-shadow:0 20px 40px rgba(15,23,42,0.08)}
+body.light .header p{color:#64748B}
+body.light label{color:#334155}
+body.light .field input, body.light .field select{background:#F8FAFC;border-color:#E2E8F0;color:#0F172A}
+body.light .field input::placeholder{color:#94A3B8}
+body.light .hint{background:rgba(16,185,129,0.1);color:#047857}
+body.light .tip{color:#94A3B8}
+</style>
 </head>
 <body>
+<button class="theme" onclick="toggleTheme()"><span id="themeIcon">🌙</span> <span id="themeLabel">Dark</span></button>
 
-  <button class="theme" onclick="toggleTheme()"><span id="themeIcon">🌙</span> <span id="themeLabel">Dark</span></button>
-
-  <main class="login-card">
-    <div class="logo-badge">
-      <div class="logo-inner">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="url(#grad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2dd4bf" /><stop offset="100%" stop-color="#6366f1" /></linearGradient></defs>
-          <path d="M9 3v18" /><path d="M5 8h8v8H5z" /><path d="m14 7 5 5-5 5" /><path d="m18 7 5 5-5 5" />
-        </svg>
-      </div>
+<div class="login-card">
+  <!-- 3D BOX LOGO LIKE YOUR PHOTO -->
+  <div class="logo-wrap">
+    <div class="logo-box">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2l1.5 2.5L12 7 10.5 4.5L12 2z" fill="#38BDF8" stroke="none"/>
+        <path d="M12 22l-1.5-2.5L12 17l1.5 2.5L12 22z" fill="#38BDF8" stroke="none"/>
+        <path d="M2 12l2.5-1.5L7 12l-2.5 1.5L2 12z" fill="#38BDF8" stroke="none"/>
+        <path d="M22 12l-2.5-1.5L17 12l2.5 1.5L22 12z" fill="#38BDF8" stroke="none"/>
+        <path d="M12 7v10M7 9.5v5M17 9.5v5" stroke="#fff" stroke-width="1.2"/>
+        <path d="M12 7l5 2.5v5L12 17l-5-2.5v-5L12 7z" fill="#1E40AF" stroke="#60A5FA"/>
+        <path d="M12 7l5 2.5L12 12l-5-2.5L12 7z" fill="#3B82F6"/>
+        <path d="M12 12v5M7 9.5L12 12l5-2.5" stroke="#93C5FD" stroke-width="1"/>
+      </svg>
     </div>
-    <div class="header"><h1>StockSync</h1><p>Manage your shop smartly</p></div>
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="username">Your Name</label>
-        <div class="input-wrapper">
-          <span class="input-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></span>
-          <input type="text" id="username" class="input-field" placeholder="e.g. Mthokozisi" required />
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="role">Role</label>
-        <div class="input-wrapper">
-          <span class="input-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" /></svg></span>
-          <select id="role" class="input-field"><option value="Admin">Admin</option><option value="Viewer">Viewer</option><option value="Cashier">Cashier</option></select>
-          <span class="select-chevron"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <div class="input-wrapper">
-          <span class="input-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg></span>
-          <input type="password" id="password" class="input-field" placeholder="Enter password" style="padding-right:42px;" required />
-          <button type="button" class="toggle-password" id="togglePwd" aria-label="Toggle password visibility">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" /><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" /><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" /><line x1="2" x2="22" y1="2" y2="22" /></svg>
-          </button>
-        </div>
-      </div>
-      <div class="credentials-box">Default: <strong>Admin</strong> = admin123 | <strong>Viewer</strong> = view123 | <strong>Cashier</strong> = cash123 — change in Settings</div>
-      <button type="submit" class="login-btn">Login <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></button>
-      <p id="err" class="err"></p>
-    </form>
-  </main>
+  </div>
 
-  <p class="footer-tip">Tip: Tap <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></svg> in dashboard for Sales, Settings, Staff</p>
+  <div class="header"><h1>StockSync</h1><p>Manage your shop smartly</p></div>
 
-  <script>
-    // THEME - DARK / LIGHT - SAVED
-    let settings = JSON.parse(localStorage.getItem('stocksync_settings') || '{"dark":true}');
-    function applyTheme(){ const dark = settings.dark !== false; document.body.classList.toggle('light', !dark); document.getElementById('themeLabel').textContent = dark ? 'Dark' : 'Light'; document.getElementById('themeIcon').textContent = dark ? '🌙' : '☀️'; }
-    function toggleTheme(){ settings.dark = !(settings.dark !== false); localStorage.setItem('stocksync_settings', JSON.stringify(settings)); applyTheme(); }
-    applyTheme();
-    // TOGGLE PASSWORD
-    const togglePwd = document.getElementById('togglePwd');
-    const passwordInput = document.getElementById('password');
-    let pwdShown = false;
-    togglePwd.addEventListener('click', () => {
-      pwdShown = !pwdShown;
-      passwordInput.type = pwdShown ? 'text' : 'password';
-      togglePwd.style.color = pwdShown ? '#2dd4bf' : '#94a3b8';
-    });
-    // LOGIN - WORKS WITH DASHBOARD
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('username').value.trim();
-      const role = document.getElementById('role').value;
-      const pass = document.getElementById('password').value.trim();
-      const err = document.getElementById('err');
-      if(!name){ err.textContent='Please enter your name'; return; }
-      if(!pass){ err.textContent='Please enter password'; return; }
-      let users = JSON.parse(localStorage.getItem('stocksync_users') || '[{"name":"Thabo","role":"Admin","pass":"admin123"},{"name":"Viewer","role":"Viewer","pass":"view123"},{"name":"Cashier","role":"Cashier","pass":"cash123"}]');
-      const byRole = users.find(u=>u.role===role && u.pass===pass);
-      const byName = users.find(u=>u.name.toLowerCase()===name.toLowerCase() && u.pass===pass);
-      const found = byName || byRole;
-      if(!found){ err.textContent='Wrong password for '+role+'. Try admin123 / view123 / cash123'; return; }
-      const finalRole = byName ? byName.role : role;
-      sessionStorage.setItem('stocksync_user', JSON.stringify({name, role:finalRole, loginTime:Date.now()}));
-      window.location.href='dashboard.html';
-    });
-  </script>
+  <form id="loginForm">
+    <label>Your Name</label>
+    <div class="field">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+      <input id="username" placeholder="e.g. Mthokozisi" autocomplete="username">
+    </div>
+
+    <label>Role</label>
+    <div class="field">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+      <select id="role"><option>Admin</option><option>Viewer</option><option>Cashier</option></select>
+      <span class="chevron">⌄</span>
+    </div>
+
+    <label>Password</label>
+    <div class="field">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+      <input id="password" type="password" placeholder="Enter password">
+      <button type="button" class="eye" id="togglePwd"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
+
+    <div class="hint">Default: Admin = admin123 | Viewer = view123<br>Cashier = cash123 — change in Settings</div>
+    <button type="submit" class="btn">Login <span>→</span></button>
+    <p id="err" class="err"></p>
+  </form>
+  <p class="tip">Tip: Tap ☰ in dashboard for Sales, Settings, Staff</p>
+</div>
+
+<script>
+let settings = JSON.parse(localStorage.getItem('stocksync_settings') || '{"dark":true}');
+function applyTheme(){ const dark = settings.dark !== false; document.body.classList.toggle('light', !dark); document.getElementById('themeLabel').textContent = dark ? 'Dark' : 'Light'; document.getElementById('themeIcon').textContent = dark ? '🌙' : '☀️'; }
+function toggleTheme(){ settings.dark = !(settings.dark !== false); localStorage.setItem('stocksync_settings', JSON.stringify(settings)); applyTheme(); }
+applyTheme();
+let shown=false;
+document.getElementById('togglePwd').onclick=()=>{ shown=!shown; document.getElementById('password').type = shown?'text':'password'; };
+document.getElementById('loginForm').addEventListener('submit',(e)=>{
+  e.preventDefault();
+  const name=document.getElementById('username').value.trim();
+  const role=document.getElementById('role').value;
+  const pass=document.getElementById('password').value.trim();
+  const err=document.getElementById('err');
+  if(!name){ err.textContent='Please enter your name'; return; }
+  if(!pass){ err.textContent='Please enter password'; return; }
+  let users = JSON.parse(localStorage.getItem('stocksync_users') || '[{"name":"Thabo","role":"Admin","pass":"admin123"},{"name":"Viewer","role":"Viewer","pass":"view123"},{"name":"Cashier","role":"Cashier","pass":"cash123"}]');
+  const byRole = users.find(u=>u.role===role && u.pass===pass);
+  const byName = users.find(u=>u.name.toLowerCase()===name.toLowerCase() && u.pass===pass);
+  const found = byName || byRole;
+  if(!found){ err.textContent='Wrong password for '+role+'. Try admin123 / view123 / cash123'; return; }
+  const finalRole = byName ? byName.role : role;
+  sessionStorage.setItem('stocksync_user', JSON.stringify({name, role:finalRole, loginTime:Date.now()}));
+  window.location.href='dashboard.html';
+});
+</script>
 </body>
 </html>
