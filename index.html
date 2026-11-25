@@ -6,29 +6,51 @@
 <title>StockSync - Login</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f172a">
-  <link rel="icon" href="Icon.jpg">
-<link rel="apple-touch-icon" href="Icon.jpg">
 <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>body{font-family:'Inter',sans-serif}</style>
 </head>
-<body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
-<div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
-  <div class="text-center mb-6">
-    <div class="text-5xl">📦</div>
-    <h1 class="text-3xl font-black mt-2">StockSync</h1>
-    <p class="text-slate-500 text-sm">Manage your stock. Anywhere.</p>
+<body class="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 relative overflow-hidden">
+<div class="absolute -top-20 -left-20 w-72 h-72 bg-blue-600 rounded-full blur-[100px] opacity-40"></div>
+<div class="absolute -bottom-20 -right-20 w-72 h-72 bg-violet-600 rounded-full blur-[100px] opacity-40"></div>
+
+<div class="relative bg-white w-full max-w-md rounded-[24px] p-6 sm:p-8 shadow-2xl">
+  <div class="flex items-center gap-3 mb-6">
+    <img src="logo.png" alt="StockSync Logo" class="w-12 h-12 rounded-2xl shadow-lg object-cover">
+    <div>
+      <h1 class="text-2xl font-black leading-none tracking-tight">StockSync</h1>
+      <p class="text-slate-500 text-[13px] mt-1">Smart stock for small business</p>
+    </div>
+    <span class="ml-auto bg-emerald-100 text-emerald-700 text-[11px] font-bold px-2.5 py-1 rounded-full">● LIVE</span>
   </div>
-  <label class="text-sm font-bold">Your Name</label>
-  <input id="name" type="text" placeholder="e.g. Thabo" class="w-full border rounded-xl p-3 mt-1 mb-4 outline-none focus:border-blue-500">
-  <label class="text-sm font-bold">Role</label>
-  <select id="role" class="w-full border rounded-xl p-3 mt-1 mb-4">
-    <option value="Admin">Admin - Can Add / Edit / Delete</option>
-    <option value="Viewer">Viewer - View Only</option>
+
+  <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-5 flex gap-3">
+    <div class="text-2xl">👋</div>
+    <div>
+      <p class="font-bold text-sm">Welcome back!</p>
+      <p class="text-slate-500 text-xs leading-relaxed">Manage your shop stock from anywhere. No paper, no stress.</p>
+    </div>
+  </div>
+
+  <label class="text-[13px] font-bold text-slate-700">Your Name</label>
+  <input id="name" type="text" placeholder="e.g. Thabo" class="w-full border border-slate-200 bg-slate-50 rounded-xl p-3.5 mt-1.5 mb-4 outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100 transition">
+
+  <label class="text-[13px] font-bold text-slate-700">Role</label>
+  <select id="role" class="w-full border border-slate-200 bg-slate-50 rounded-xl p-3.5 mt-1.5 mb-4 outline-none">
+    <option value="Admin">👑 Admin - Can Add / Edit / Delete</option>
+    <option value="Viewer">👀 Viewer - View Only</option>
   </select>
-  <label class="text-sm font-bold">Admin Password <span class="font-normal text-slate-400">(Only for Admin)</span></label>
-  <input id="password" type="password" placeholder="Admin password" class="w-full border rounded-xl p-3 mt-1 mb-4 outline-none focus:border-blue-500">
-  <button onclick="login()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700">Login →</button>
-  <p id="error" class="text-red-500 text-sm text-center mt-3 hidden"></p>
-  <p class="text-center text-xs text-slate-400 mt-4">Default Admin password: <b>admin123</b></p>
+
+  <label class="text-[13px] font-bold text-slate-700">Admin Password <span class="font-normal text-slate-400">(Only for Admin)</span></label>
+  <input id="password" type="password" placeholder="••••••••" class="w-full border border-slate-200 bg-slate-50 rounded-xl p-3.5 mt-1.5 mb-4 outline-none focus:border-blue-600 focus:bg-white">
+
+  <button onclick="login()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl hover:bg-blue-600 active:scale-[0.98] transition shadow-lg">Login →</button>
+  <p id="error" class="text-red-500 text-sm text-center mt-3 hidden font-medium"></p>
+
+  <div class="flex items-center gap-2 justify-center mt-5 text-[11px] text-slate-400">
+    <span>🔒 Secure</span><span>•</span><span>📱 Works offline</span><span>•</span><span>⚡ Fast</span>
+  </div>
+  <p class="text-center text-[11px] text-slate-400 mt-2">Admin password: <b class="text-slate-600">admin123</b> — change it later</p>
 </div>
 <script>
 function login(){
@@ -37,9 +59,8 @@ function login(){
   const pass = document.getElementById('password').value;
   const err = document.getElementById('error');
   if(!name){ err.textContent="Please enter your name"; err.classList.remove('hidden'); return; }
-  const savedPass = localStorage.getItem('stocksync_admin_pass') || "admin123";
-  if(role==="Admin" && pass!==savedPass){
-    err.textContent="Wrong Admin password! Try: " + savedPass; err.classList.remove('hidden'); return;
+  if(role==="Admin" && pass!=="admin123"){
+    err.textContent="Wrong Admin password!"; err.classList.remove('hidden'); return;
   }
   const user = { name, role, loginTime: Date.now() };
   sessionStorage.setItem('stocksync_user', JSON.stringify(user));
