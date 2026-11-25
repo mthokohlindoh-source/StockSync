@@ -8,7 +8,14 @@
 <meta name="theme-color" content="#0f172a">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-<style>body{font-family:'Inter',sans-serif}</style>
+<style>
+body{font-family:'Inter',sans-serif}
+#sidebar{transition: transform .3s ease} #overlay{transition: opacity .3s ease}
+.dark-mode{ background:#0f172a !important; color:#e2e8f0 !important; }
+.dark-mode .card{ background:#1e293b !important; border-color:#334155 !important; color:#e2e8f0 !important; }
+.dark-mode input, .dark-mode select{ background:#334155 !important; color:white !important; border-color:#475569 !important; }
+.dark-mode .text-slate-500, .dark-mode .text-slate-400{ color:#94a3b8 !important; }
+</style>
 <script>
 const saved = sessionStorage.getItem('stocksync_user');
 if(!saved){ window.location.replace('index.html'); }
@@ -18,131 +25,263 @@ history.pushState(null, null, location.href);
 window.onpopstate = function(){ history.pushState(null, null, location.href); };
 </script>
 </head>
-<body class="bg-[#f1f5f9] min-h-screen">
+<body id="body" class="bg-[#f1f5f9] min-h-screen">
+<div id="overlay" onclick="toggleMenu(false)" class="fixed inset-0 bg-black/60 z-30 opacity-0 pointer-events-none"></div>
+
+<aside id="sidebar" class="fixed top-0 left-0 h-full w-[78%] max-w-[320px] bg-[#0b0b1e] text-white z-40 -translate-x-full flex flex-col p-5">
+  <div class="flex items-center justify-between mb-7">
+    <div class="flex items-center gap-2.5 min-w-0"><img src="logo.png" class="w-10 h-10 rounded-xl object-cover bg-white p-0.5 shrink-0" onerror="this.style.display='none'"><span class="font-black text-[26px] text-[#38bdf8] truncate">StockSync</span></div>
+    <button onclick="toggleMenu(false)" class="text-3xl px-1">×</button>
+  </div>
+  <nav class="space-y-1.5 flex-1">
+    <button id="nav-dashboard" onclick="showView('dashboard')" class="w-full flex gap-3 px-4 py-3.5 rounded-2xl bg-[#2a3446] font-semibold text-left"><span>🏠</span> Dashboard</button>
+    <button id="nav-products" onclick="showView('products')" class="w-full flex gap-3 px-4 py-3.5 rounded-2xl text-white/70 text-left"><span>📦</span> Products</button>
+    <button id="nav-low" onclick="showView('low')" class="w-full flex gap-3 px-4 py-3.5 rounded-2xl text-white/70 text-left"><span>📉</span> Low Stock</button>
+    <button id="nav-sales" onclick="showView('sales')" class="w-full flex gap-3 px-4 py-3.5 rounded-2xl text-white/70 text-left"><span>💰</span> Sales</button>
+    <button id="nav-report" onclick="showView('report')" class="w-full flex gap-3 px-4 py-3.5 rounded-2xl text-white/70 text-left"><span>📊</span> Sales Report</button>
+    <button id="nav-settings" onclick="showView('settings')" class="w-full flex gap-3 px-4 py-3.5 rounded-2xl text-white/70 text-left"><span>⚙️</span> Settings</button>
+    <button onclick="logout()" class="w-full flex gap-3 px-4 py-3.5 rounded-2xl text-red-400 text-left"><span>🚪</span> Logout</button>
+  </nav>
+  <div class="pt-5 border-t border-white/10"><p class="text-white/60 text-sm">Logged in as:</p><p id="sidebarUser" class="font-bold truncate"></p><p id="syncStatus" class="text-[11px] text-white/40 mt-1">☁️ Last sync: Never</p></div>
+</aside>
 
 <header class="bg-slate-900 text-white sticky top-0 z-20 shadow-lg">
-  <div class="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
-    <div class="flex items-center gap-3">
-      <img src="logo.png" alt="StockSync" class="w-10 h-10 rounded-xl object-cover bg-white p-0.5">
-      <div>
-        <h1 class="font-black text-lg leading-none">StockSync</h1>
-        <p id="welcome" class="text-[11px] text-slate-300 mt-1"></p>
-      </div>
+  <div class="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center gap-3">
+    <div class="flex items-center gap-3 min-w-0 flex-1">
+      <button onclick="toggleMenu(true)" class="text-2xl shrink-0 px-1">☰</button>
+      <img src="logo.png" class="w-10 h-10 rounded-xl object-cover bg-white p-0.5 shrink-0" onerror="this.style.display='none'">
+      <div class="min-w-0 flex-1"><h1 class="font-black text-lg leading-none truncate">StockSync</h1><p id="welcome" class="text-[11px] text-slate-300 mt-1 truncate"></p></div>
     </div>
-    <button onclick="logout()" class="bg-white/10 hover:bg-red-500 px-3.5 py-2 rounded-full font-bold text-xs transition">Logout</button>
-  </div>
-  <div class="max-w-3xl mx-auto px-4 pb-3 flex gap-2">
-    <span class="bg-white text-slate-900 text-xs font-bold px-3 py-1.5 rounded-full">📊 Dashboard</span>
-    <span class="bg-white/10 text-white/80 text-xs font-bold px-3 py-1.5 rounded-full">📦 All Stock</span>
-    <span class="bg-white/10 text-white/80 text-xs font-bold px-3 py-1.5 rounded-full">⚠️ Low Stock</span>
+    <button onclick="toggleDark()" id="darkBtn" class="bg-white/10 px-3 py-2 rounded-full text-xs font-bold shrink-0">🌙 Dark</button>
+    <button onclick="logout()" class="bg-white/10 px-4 py-2 rounded-full font-bold text-xs shrink-0">Logout</button>
   </div>
 </header>
 
+<div id="lowAlert" class="hidden max-w-3xl mx-auto mt-3 mx-4 bg-red-500 text-white p-4 rounded-2xl flex justify-between items-center"><span id="lowAlertText" class="font-bold text-sm"></span><button onclick="document.getElementById('lowAlert').classList.add('hidden')" class="font-black">×</button></div>
+
 <main class="p-4 max-w-3xl mx-auto pb-24">
-  <div class="bg-gradient-to-r from-blue-600 to-violet-600 text-white rounded-[24px] p-5 mb-4 shadow-lg relative overflow-hidden">
-    <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/20 rounded-full blur-xl"></div>
-    <p class="text-white/80 text-xs font-bold uppercase tracking-wider">Today's Overview</p>
-    <h2 class="text-2xl font-black mt-1 leading-tight">Your shop at<br>a glance 👀</h2>
-    <p class="text-white/80 text-xs mt-2">Keep track, sell more, stress less.</p>
+  <!-- DASHBOARD -->
+  <div id="view-dashboard">
+    <div class="bg-gradient-to-r from-blue-600 to-violet-600 text-white rounded-[24px] p-5 mb-4 shadow-lg"><p class="text-white/80 text-xs font-bold uppercase">Today's Overview</p><h2 class="text-2xl font-black mt-1">Your shop at<br>a glance 👀</h2><p class="text-white/80 text-xs mt-2">Keep track, sell more, stress less.</p></div>
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      <div class="card bg-white p-3.5 rounded-2xl border border-slate-100"><div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-2">📦</div><p class="text-[11px] text-slate-500">Total Items</p><p id="totalItems" class="text-[22px] font-black">0</p></div>
+      <div class="card bg-white p-3.5 rounded-2xl border border-slate-100"><div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center mb-2">🔢</div><p class="text-[11px] text-slate-500">Total Qty</p><p id="totalQty" class="text-[22px] font-black">0</p></div>
+      <div class="card bg-white p-3.5 rounded-2xl border border-red-100"><div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mb-2">⚠️</div><p class="text-[11px] text-slate-500">Low Stock</p><p id="lowStock" class="text-[22px] font-black text-red-500">0</p></div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div class="bg-emerald-600 text-white p-4 rounded-2xl"><p class="text-[11px] text-white/80">💰 Total Sales</p><p id="dashSalesTotal" class="text-xl font-black mt-1">R 0.00</p></div>
+      <div class="bg-slate-900 text-white p-4 rounded-2xl"><p class="text-[11px] text-white/70">🧾 Sales</p><p id="dashSalesCount" class="text-xl font-black mt-1">0 sales</p></div>
+    </div>
+    <div class="relative mb-4"><span class="absolute left-4 top-3.5 text-slate-400">🔍</span><input id="search" oninput="render()" placeholder="Search product... e.g. Coke" class="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 bg-white shadow-sm outline-none"></div>
+
+    <!-- ADD PRODUCT + BARCODE -->
+    <div id="adminBox" class="card bg-white p-5 rounded-[24px] border border-slate-100 mb-4">
+      <div class="flex justify-between mb-3"><h2 class="font-black">➕ Add New Product</h2><span class="bg-blue-100 text-blue-700 text-[11px] font-bold px-2.5 py-1 rounded-full">Admin Only</span></div>
+      <input id="pName" placeholder="Product name - e.g. Coca-Cola 500ml" class="w-full border border-slate-200 bg-slate-50 rounded-xl p-3.5 mb-2.5 outline-none">
+      <div class="flex gap-2.5 mb-2.5">
+        <input id="pQty" type="number" placeholder="Qty" class="flex-1 min-w-0 border border-slate-200 bg-slate-50 rounded-xl p-3.5 outline-none">
+        <input id="pPrice" type="number" placeholder="Price R" class="flex-1 min-w-0 border border-slate-200 bg-slate-50 rounded-xl p-3.5 outline-none">
+      </div>
+      <div class="flex gap-2.5">
+        <input id="pBarcode" placeholder="Barcode (optional) - e.g. 60012345" class="flex-1 min-w-0 border border-slate-200 bg-slate-50 rounded-xl p-3.5 outline-none">
+        <button onclick="scanBarcode()" class="bg-slate-900 text-white font-bold px-4 rounded-xl text-sm shrink-0">📷 Scan</button>
+      </div>
+      <input id="barcodeInput" placeholder="🔍 Scan barcode to find / sell product..." oninput="findByBarcode()" class="w-full border border-dashed border-blue-300 bg-blue-50 rounded-xl p-3.5 mt-2.5 outline-none">
+      <p id="barcodeMsg" class="text-xs text-slate-400 mt-1.5">Tip: Type barcode and it will find the product. Use phone camera in Settings > Barcode if your phone supports it.</p>
+      <button onclick="addProduct()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl mt-3">+ Add to Stock</button>
+    </div>
+    <div id="viewerMsg" class="hidden bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl text-sm mb-4">👀 You are a Viewer — you can only view stock.</div>
+    <div class="flex justify-between mb-3 px-1"><h3 class="font-black">Your Products</h3><span class="text-xs text-slate-400">Tap + / - • 💰 to sell • 🧾 receipt</span></div>
+    <div id="list" class="space-y-3"></div>
   </div>
 
-  <div class="grid grid-cols-3 gap-3 mb-4">
-    <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100">
-      <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-2">📦</div>
-      <p class="text-[11px] text-slate-500 font-semibold">Total Items</p>
-      <p id="totalItems" class="text-[22px] font-black leading-none mt-1">0</p>
-    </div>
-    <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100">
-      <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center mb-2">🔢</div>
-      <p class="text-[11px] text-slate-500 font-semibold">Total Qty</p>
-      <p id="totalQty" class="text-[22px] font-black leading-none mt-1">0</p>
-    </div>
-    <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-red-100">
-      <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mb-2">⚠️</div>
-      <p class="text-[11px] text-slate-500 font-semibold">Low Stock</p>
-      <p id="lowStock" class="text-[22px] font-black text-red-500 leading-none mt-1">0</p>
-    </div>
+  <!-- PRODUCTS -->
+  <div id="view-products" class="hidden"><h2 class="text-2xl font-black">📦 All Products</h2><p class="text-slate-500 text-sm mb-4">Everything in your shop.</p><div id="list-products" class="space-y-3"></div></div>
+  <!-- LOW -->
+  <div id="view-low" class="hidden"><h2 class="text-2xl font-black">📉 Low Stock</h2><p class="text-slate-500 text-sm mb-4">Below <span id="lowLabel" class="font-bold text-red-500">5</span> items.</p><div id="list-low" class="space-y-3"></div></div>
+
+  <!-- SALES -->
+  <div id="view-sales" class="hidden">
+    <h2 class="text-2xl font-black">💰 Sales</h2><p class="text-slate-500 text-sm mb-4">Every sale is saved here.</p>
+    <div class="grid grid-cols-2 gap-3 mb-4"><div class="bg-emerald-600 text-white p-4 rounded-2xl"><p class="text-[11px]">Total Made</p><p id="salesTotal" class="text-xl font-black">R 0.00</p></div><div class="card bg-white p-4 rounded-2xl border"><p class="text-[11px] text-slate-500">Total Sales</p><p id="salesCount" class="text-xl font-black">0</p></div></div>
+    <div class="card bg-white p-5 rounded-[24px] border mb-4"><h3 class="font-black mb-3">🧾 Make a Sale</h3><select id="saleProduct" class="w-full border bg-slate-50 rounded-xl p-3.5 mb-3"></select><div class="flex gap-2.5"><input id="saleQty" type="number" value="1" min="1" class="flex-1 border bg-slate-50 rounded-xl p-3.5"><button onclick="makeSale()" class="flex-1 bg-emerald-600 text-white font-bold rounded-xl">Sell Now 💰</button></div><p id="saleMsg" class="text-xs text-slate-400 mt-2">Stock will go down automatically.</p></div>
+    <div id="list-sales" class="space-y-3"></div>
+    <button onclick="clearSales()" class="w-full mt-4 bg-red-50 text-red-600 font-bold py-3 rounded-xl text-sm">Clear Sales History</button>
   </div>
 
-  <div class="relative mb-4">
-    <span class="absolute left-4 top-3.5 text-slate-400">🔍</span>
-    <input id="search" oninput="render()" placeholder="Search product... e.g. Coke" class="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 bg-white shadow-sm outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100">
+  <!-- REPORT -->
+  <div id="view-report" class="hidden">
+    <h2 class="text-2xl font-black">📊 Sales Report</h2><p class="text-slate-500 text-sm mb-4">See how your shop is doing.</p>
+    <div class="flex gap-2 mb-4"><button onclick="setReport('today')" id="rep-today" class="flex-1 bg-slate-900 text-white font-bold py-2.5 rounded-xl text-sm">Today</button><button onclick="setReport('week')" id="rep-week" class="flex-1 bg-white border font-bold py-2.5 rounded-xl text-sm">This Week</button><button onclick="setReport('month')" id="rep-month" class="flex-1 bg-white border font-bold py-2.5 rounded-xl text-sm">This Month</button></div>
+    <div class="card bg-white p-5 rounded-[24px] border mb-4"><p class="text-sm text-slate-500">Revenue in period</p><p id="repTotal" class="text-3xl font-black">R 0.00</p><p id="repCount" class="text-sm text-slate-400 mt-1">0 sales</p><p class="font-bold mt-4">🏆 Best Seller:</p><p id="repBest" class="text-emerald-600 font-bold">No sales yet</p></div>
+    <div id="list-report" class="space-y-3"></div>
   </div>
 
-  <div id="adminBox" class="bg-white p-5 rounded-[24px] shadow-sm border border-slate-100 mb-4">
-    <div class="flex items-center justify-between mb-3">
-      <h2 class="font-black">➕ Add New Product</h2>
-      <span class="bg-blue-100 text-blue-700 text-[11px] font-bold px-2.5 py-1 rounded-full">Admin Only</span>
+  <!-- SETTINGS -->
+  <div id="view-settings" class="hidden">
+    <h2 class="text-2xl font-black">⚙️ Settings</h2><p class="text-slate-500 text-sm mb-4">Control your shop.</p>
+    <div class="card bg-white p-5 rounded-[24px] border space-y-6">
+      <div><p class="font-bold">👤 Logged in as</p><p id="settingsUser" class="text-slate-500 text-sm"></p><p id="settingsShop" class="text-xs text-slate-400"></p></div>
+
+      <!-- 1 CHANGE PASSWORD -->
+      <div class="border-t pt-5"><p class="font-bold">🔑 Change Password</p>
+        <select id="passRole" class="w-full border bg-slate-50 rounded-xl p-3.5 mt-2"><option>Admin</option><option>Viewer</option><option>Cashier</option></select>
+        <input id="newPass" placeholder="New password" class="w-full border bg-slate-50 rounded-xl p-3.5 mt-2">
+        <button onclick="changePassword()" class="mt-2 bg-slate-900 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Save New Password</button>
+        <p class="text-xs text-slate-400 mt-1">Example: Admin new password will be used on login screen.</p>
+      </div>
+
+      <!-- 4 STAFF -->
+      <div class="border-t pt-5"><p class="font-bold">👥 Staff - Add / Remove</p>
+        <input id="staffName" placeholder="Staff name - e.g. Lerato" class="w-full border bg-slate-50 rounded-xl p-3.5 mt-2">
+        <div class="flex gap-2 mt-2"><select id="staffRole" class="flex-1 border bg-slate-50 rounded-xl p-3.5"><option>Cashier</option><option>Viewer</option><option>Admin</option></select><input id="staffPass" placeholder="Password" class="flex-1 border bg-slate-50 rounded-xl p-3.5"></div>
+        <button onclick="addStaff()" class="mt-2 bg-blue-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">+ Add Staff</button>
+        <div id="staffList" class="mt-3 space-y-2"></div>
+      </div>
+
+      <!-- SHOP NAME + LOW STOCK -->
+      <div class="border-t pt-5"><p class="font-bold">🏪 Shop Name</p><input id="shopName" class="w-full border bg-slate-50 rounded-xl p-3.5 mt-2"><button onclick="saveShopName()" class="mt-2 bg-slate-900 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Save Shop Name</button></div>
+      <div><p class="font-bold">⚠️ Low Stock Alert At</p><div class="flex gap-2 mt-2"><input id="lowThreshold" type="number" class="flex-1 border bg-slate-50 rounded-xl p-3.5"><button onclick="saveThreshold()" class="bg-blue-600 text-white font-bold text-sm px-4 rounded-xl">Save</button></div>
+        <label class="flex items-center gap-2 mt-3 text-sm font-medium"><input id="alertToggle" type="checkbox" checked onchange="saveAlertToggle()" class="w-4 h-4"> Show Low Stock popup + sound</label>
+      </div>
+
+      <!-- 6 DARK MODE -->
+      <div class="border-t pt-5"><p class="font-bold">🌙 Appearance</p><button onclick="toggleDark()" class="mt-2 bg-slate-900 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Toggle Dark / Light Mode</button><p class="text-xs text-slate-400 mt-1">Current: <span id="modeLabel">Light</span></p></div>
+
+      <!-- 9 BARCODE -->
+      <div class="border-t pt-5"><p class="font-bold">📷 Barcode Scanner</p><p class="text-xs text-slate-400">Use your camera if your phone supports BarcodeDetector, otherwise type barcode manually above.</p><button onclick="scanBarcode()" class="mt-2 bg-slate-900 text-white font-bold text-sm px-4 py-2.5 rounded-xl">📷 Open Camera Scanner</button><p id="barcodeStatus" class="text-xs mt-1"></p></div>
+
+      <!-- 2 BACKUP -->
+      <div class="border-t pt-5"><p class="font-bold">💾 Backup / Export</p>
+        <button onclick="exportCSV()" class="w-full mt-2 bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm">📊 Export Products + Sales to Excel (CSV)</button>
+        <button onclick="backupJSON()" class="w-full mt-2 bg-slate-900 text-white font-bold py-3 rounded-xl text-sm">☁️ Download Full Backup (JSON)</button>
+        <label class="block mt-3 text-sm font-bold">Restore Backup:</label><input type="file" id="restoreFile" accept=".json" onchange="restoreJSON(event)" class="w-full text-sm mt-1">
+      </div>
+
+      <!-- 10 CLOUD SYNC -->
+      <div class="border-t pt-5"><p class="font-bold">☁️ Cloud Sync</p><p class="text-xs text-slate-400">Saves a backup copy in your browser + shows last sync time. For real Google Drive sync, use Download Backup above.</p><button onclick="cloudSync()" class="mt-2 bg-blue-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Sync Now</button><p id="cloudMsg" class="text-xs text-emerald-600 font-bold mt-1"></p></div>
+
+      <div class="border-t pt-5"><p class="font-bold text-red-600">Danger Zone</p><button onclick="clearAllProducts()" class="w-full mt-3 bg-red-50 text-red-600 font-bold py-3 rounded-xl text-sm">🗑️ Delete All Products</button><button onclick="clearAllData()" class="w-full mt-2 bg-red-600 text-white font-bold py-3 rounded-xl text-sm">Reset Everything</button></div>
     </div>
-    <input id="pName" placeholder="Product name - e.g. Coca-Cola 500ml" class="w-full border border-slate-200 bg-slate-50 rounded-xl p-3.5 mb-2.5 outline-none focus:bg-white focus:border-blue-600">
-    <div class="flex gap-2.5">
-      <input id="pQty" type="number" placeholder="Qty" class="flex-1 border border-slate-200 bg-slate-50 rounded-xl p-3.5 outline-none">
-      <input id="pPrice" type="number" placeholder="Price R" class="flex-1 border border-slate-200 bg-slate-50 rounded-xl p-3.5 outline-none">
-    </div>
-    <button onclick="addProduct()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl mt-3 hover:bg-blue-600 active:scale-[0.98] transition">+ Add to Stock</button>
   </div>
-
-  <div id="viewerMsg" class="hidden bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl text-sm mb-4">👀 You are a Viewer — you can only view stock. Ask Admin to add products.</div>
-
-  <div class="flex items-center justify-between mb-3 px-1">
-    <h3 class="font-black text-[15px]">Your Products</h3>
-    <span class="text-xs text-slate-400 font-medium">Tap + / - to update</span>
-  </div>
-
-  <div id="list" class="space-y-3"></div>
 </main>
+
+<!-- RECEIPT MODAL -->
+<div id="receiptModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-sm rounded-[24px] p-6">
+    <h3 class="font-black text-center text-lg">🧾 StockSync Receipt</h3>
+    <p id="receiptShop" class="text-center text-xs text-slate-400"></p>
+    <div class="border-t border-dashed my-3"></div>
+    <div id="receiptBody" class="text-sm space-y-1"></div>
+    <div class="border-t border-dashed my-3"></div>
+    <p id="receiptTotal" class="font-black text-right"></p>
+    <p class="text-center text-xs text-slate-400 mt-2">Thank you for shopping with us! 🙏</p>
+    <div class="flex gap-2 mt-4"><button onclick="shareReceipt()" class="flex-1 bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm">Share on WhatsApp</button><button onclick="closeReceipt()" class="flex-1 bg-slate-100 font-bold py-3 rounded-xl text-sm">Close</button></div>
+  </div>
+</div>
 
 <script>
 let products = JSON.parse(localStorage.getItem('stocksync_products') || '[]');
+let sales = JSON.parse(localStorage.getItem('stocksync_sales') || '[]');
+let settings = JSON.parse(localStorage.getItem('stocksync_settings') || '{"threshold":5,"shopName":"","alert":true,"dark":false,"lastSync":""}');
+let users = JSON.parse(localStorage.getItem('stocksync_users') || '[{"name":"Thabo","role":"Admin","pass":"admin123"},{"name":"Viewer","role":"Viewer","pass":"view123"},{"name":"Cashier","role":"Cashier","pass":"cash123"}]');
+let currentView='dashboard', reportPeriod='today', lastReceipt=null;
+
 document.getElementById('welcome').textContent = `Hi ${user.name} • ${user.role}`;
-if(user.role !== 'Admin'){
-  document.getElementById('adminBox').style.display='none';
-  document.getElementById('viewerMsg').classList.remove('hidden');
+document.getElementById('sidebarUser').textContent = `${user.name} (${user.role})`;
+document.getElementById('settingsUser').textContent = `${user.name} (${user.role})`;
+document.getElementById('shopName').value = settings.shopName || '';
+document.getElementById('lowThreshold').value = settings.threshold || 5;
+document.getElementById('lowLabel').textContent = settings.threshold || 5;
+document.getElementById('alertToggle').checked = settings.alert !== false;
+if(settings.dark) applyDark(true);
+if(settings.lastSync) document.getElementById('syncStatus').textContent = '☁️ Last sync: ' + settings.lastSync;
+if(user.role!=='Admin'){ document.getElementById('adminBox').style.display='none'; document.getElementById('viewerMsg').classList.remove('hidden'); }
+
+function getThreshold(){ return parseInt(settings.threshold)||5; }
+function toggleMenu(o){ const sb=document.getElementById('sidebar'), ov=document.getElementById('overlay'); if(o){sb.classList.remove('-translate-x-full'); ov.classList.remove('opacity-0','pointer-events-none');} else {sb.classList.add('-translate-x-full'); ov.classList.add('opacity-0','pointer-events-none');} }
+function showView(v){ toggleMenu(false); currentView=v; ['dashboard','products','low','sales','report','settings'].forEach(x=>{ document.getElementById('view-'+x).classList.add('hidden'); document.getElementById('nav-'+x).classList.remove('bg-[#2a3446]'); }); document.getElementById('view-'+v).classList.remove('hidden'); document.getElementById('nav-'+v).classList.add('bg-[#2a3446]'); window.scrollTo({top:0,behavior:'smooth'}); render(); }
+function saveProducts(){ localStorage.setItem('stocksync_products', JSON.stringify(products)); render(); }
+function saveSales(){ localStorage.setItem('stocksync_sales', JSON.stringify(sales)); render(); }
+function saveSettings(){ localStorage.setItem('stocksync_settings', JSON.stringify(settings)); render(); }
+function saveUsers(){ localStorage.setItem('stocksync_users', JSON.stringify(users)); render(); }
+
+// DARK MODE
+function applyDark(on){ document.getElementById('body').classList.toggle('dark-mode', on); document.getElementById('modeLabel').textContent = on?'Dark':'Light'; document.getElementById('darkBtn').textContent = on?'☀️ Light':'🌙 Dark'; }
+function toggleDark(){ settings.dark = !settings.dark; applyDark(settings.dark); saveSettings(); }
+
+// PRODUCTS + BARCODE
+function addProduct(){ if(user.role!=='Admin') return alert('Viewers cannot add'); const name=document.getElementById('pName').value.trim(); const qty=parseInt(document.getElementById('pQty').value); const price=parseFloat(document.getElementById('pPrice').value)||0; const barcode=document.getElementById('pBarcode').value.trim(); if(!name||isNaN(qty)) return alert('Enter name and qty'); products.push({id:Date.now(), name, qty, price, barcode}); ['pName','pQty','pPrice','pBarcode'].forEach(id=>document.getElementById(id).value=''); saveProducts(); }
+function del(id){ if(user.role!=='Admin') return; if(confirm('Delete?')){ products=products.filter(p=>p.id!==id); saveProducts(); } }
+function changeQty(id,a){ if(user.role!=='Admin') return; const p=products.find(x=>x.id===id); p.qty=Math.max(0,p.qty+a); saveProducts(); }
+function findByBarcode(){ const code=document.getElementById('barcodeInput').value.trim(); if(!code) return; const p=products.find(x=>x.barcode===code); document.getElementById('barcodeMsg').textContent = p ? `✅ Found: ${p.name} - R ${p.price.toFixed(2)} (${p.qty} left) - Tap 💰 to sell` : `❌ No product with barcode ${code}. Add it above with this barcode.`; document.getElementById('barcodeMsg').className='text-xs font-bold mt-1.5 ' + (p?'text-emerald-600':'text-red-500'); }
+async function scanBarcode(){
+  document.getElementById('barcodeStatus').textContent = 'Opening camera...';
+  if(!('BarcodeDetector' in window)){ document.getElementById('barcodeStatus').textContent='Your phone does not support camera barcode. Type barcode manually in the box above.'; const c=prompt('Enter / Scan barcode:'); if(c){ document.getElementById('pBarcode').value=c; document.getElementById('barcodeInput').value=c; findByBarcode(); } return; }
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const video = document.createElement('video'); video.srcObject=stream; await video.play();
+    const detector = new BarcodeDetector({formats:['ean_13','ean_8','code_128','upc_a','qr_code']});
+    document.getElementById('barcodeStatus').textContent='📷 Point camera at barcode...';
+    const interval=setInterval(async()=>{
+      try{ const codes=await detector.detect(video); if(codes.length){ clearInterval(interval); stream.getTracks().forEach(t=>t.stop()); const val=codes[0].rawValue; document.getElementById('pBarcode').value=val; document.getElementById('barcodeInput').value=val; document.getElementById('barcodeStatus').textContent='✅ Scanned: '+val; findByBarcode(); } }catch(e){}
+    },500);
+    setTimeout(()=>{ clearInterval(interval); stream.getTracks().forEach(t=>t.stop()); },15000);
+  }catch(e){ document.getElementById('barcodeStatus').textContent='Camera blocked. Type barcode manually.'; }
 }
-function save(){ localStorage.setItem('stocksync_products', JSON.stringify(products)); render(); }
-function addProduct(){
-  if(user.role!=='Admin') return alert('Viewers cannot add products');
-  const name=document.getElementById('pName').value.trim();
-  const qty=parseInt(document.getElementById('pQty').value);
-  const price=parseFloat(document.getElementById('pPrice').value)||0;
-  if(!name || isNaN(qty)) return alert('Enter name and qty');
-  products.push({id:Date.now(), name, qty, price});
-  document.getElementById('pName').value=''; document.getElementById('pQty').value=''; document.getElementById('pPrice').value='';
-  save();
-}
-function del(id){ if(user.role!=='Admin') return; if(confirm('Delete this product?')){ products=products.filter(p=>p.id!==id); save(); } }
-function changeQty(id, amount){ if(user.role!=='Admin') return; const p=products.find(x=>x.id===id); p.qty=Math.max(0,p.qty+amount); save(); }
+
+// SALES + RECEIPT
+function makeSale(){ if(user.role!=='Admin' && user.role!=='Cashier') return alert('Viewers cannot sell'); const pid=parseInt(document.getElementById('saleProduct').value); const qty=parseInt(document.getElementById('saleQty').value)||1; const p=products.find(x=>x.id===pid); if(!p) return alert('Choose product'); if(p.qty<qty) return alert(`Only ${p.qty} left`); p.qty-=qty; const total=qty*p.price; const sale={id:Date.now(), name:p.name, qty, price:p.price, total, date:new Date().toLocaleString(), ts:Date.now()}; sales.unshift(sale); showReceipt(sale); saveProducts(); saveSales(); }
+function sellOne(id){ const p=products.find(x=>x.id===id); if(!p||p.qty<=0) return alert('Out of stock'); if(user.role==='Viewer') return alert('Viewers cannot sell'); p.qty-=1; const sale={id:Date.now(), name:p.name, qty:1, price:p.price, total:p.price, date:new Date().toLocaleString(), ts:Date.now()}; sales.unshift(sale); showReceipt(sale); saveProducts(); saveSales(); }
+function showReceipt(s){ lastReceipt=s; document.getElementById('receiptShop').textContent = settings.shopName || 'StockSync'; document.getElementById('receiptBody').innerHTML = `<p>${s.name}</p><p class="text-slate-500">${s.qty} x R ${s.price.toFixed(2)} • ${s.date}</p><p class="text-slate-500">Sold by: ${user.name}</p>`; document.getElementById('receiptTotal').textContent='Total: R '+s.total.toFixed(2); document.getElementById('receiptModal').classList.remove('hidden'); }
+function closeReceipt(){ document.getElementById('receiptModal').classList.add('hidden'); }
+function shareReceipt(){ if(!lastReceipt) return; const text=`🧾 StockSync Receipt\n${settings.shopName||'StockSync'}\n\n${lastReceipt.name}\n${lastReceipt.qty} x R ${lastReceipt.price.toFixed(2)}\nTotal: R ${lastReceipt.total.toFixed(2)}\nDate: ${lastReceipt.date}\n\nThank you! 🙏`; window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank'); }
+function clearSales(){ if(confirm('Clear sales?')){ sales=[]; saveSales(); } }
+
+// SETTINGS FUNCTIONS
+function changePassword(){ const role=document.getElementById('passRole').value; const np=document.getElementById('newPass').value.trim(); if(!np) return alert('Enter new password'); const u=users.find(x=>x.role===role); if(u) u.pass=np; else users.push({name:role, role, pass:np}); document.getElementById('newPass').value=''; saveUsers(); alert(`✅ ${role} password changed to: ${np}`); }
+function addStaff(){ const name=document.getElementById('staffName').value.trim(); const role=document.getElementById('staffRole').value; const pass=document.getElementById('staffPass').value.trim(); if(!name||!pass) return alert('Enter name + password'); users.push({name, role, pass}); document.getElementById('staffName').value=''; document.getElementById('staffPass').value=''; saveUsers(); alert(`✅ Added ${name} as ${role}`); }
+function removeStaff(idx){ if(confirm('Remove this staff?')){ users.splice(idx,1); saveUsers(); } }
+function saveShopName(){ settings.shopName=document.getElementById('shopName').value.trim(); saveSettings(); alert('✅ Shop name saved'); }
+function saveThreshold(){ const v=parseInt(document.getElementById('lowThreshold').value); if(!v||v<1) return alert('Enter valid number'); settings.threshold=v; document.getElementById('lowLabel').textContent=v; saveSettings(); alert(`✅ Low stock set to below ${v}`); }
+function saveAlertToggle(){ settings.alert=document.getElementById('alertToggle').checked; saveSettings(); }
+function clearAllProducts(){ if(user.role!=='Admin') return alert('Admin only'); if(confirm('Delete ALL products?')){ products=[]; saveProducts(); } }
+function clearAllData(){ if(user.role!=='Admin') return alert('Admin only'); if(confirm('Reset EVERYTHING?')){ products=[]; sales=[]; settings={threshold:5,shopName:'',alert:true,dark:false,lastSync:''}; localStorage.clear(); sessionStorage.setItem('stocksync_user', JSON.stringify(user)); location.reload(); } }
+
+// BACKUP / EXPORT / CLOUD
+function exportCSV(){ let csv='Type,Name,Qty,Price,Total,Date\n'; products.forEach(p=>csv+=`Product,${p.name},${p.qty},${p.price},,${p.barcode||''}\n`); sales.forEach(s=>csv+=`Sale,${s.name},${s.qty},${s.price},${s.total},${s.date}\n`); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='stocksync-export.csv'; a.click(); alert('✅ CSV downloaded - open in Excel / Google Sheets'); }
+function backupJSON(){ const data={products, sales, settings, users, backedUpAt:new Date().toLocaleString()}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='stocksync-backup.json'; a.click(); alert('✅ Backup downloaded. Keep it safe!'); }
+function restoreJSON(e){ const file=e.target.files[0]; if(!file) return; const r=new FileReader(); r.onload=()=>{ try{ const d=JSON.parse(r.result); if(d.products) products=d.products; if(d.sales) sales=d.sales; if(d.settings) settings=d.settings; if(d.users) users=d.users; localStorage.setItem('stocksync_products',JSON.stringify(products)); localStorage.setItem('stocksync_sales',JSON.stringify(sales)); localStorage.setItem('stocksync_settings',JSON.stringify(settings)); localStorage.setItem('stocksync_users',JSON.stringify(users)); alert('✅ Restored!'); location.reload(); }catch(err){ alert('❌ Invalid backup file'); } }; r.readAsText(file); }
+function cloudSync(){ settings.lastSync=new Date().toLocaleString(); localStorage.setItem('stocksync_settings',JSON.stringify(settings)); document.getElementById('syncStatus').textContent='☁️ Last sync: '+settings.lastSync; document.getElementById('cloudMsg').textContent='✅ Synced at '+settings.lastSync+' - '+products.length+' products, '+sales.length+' sales saved.'; backupJSON(); }
+
+// REPORT
+function setReport(p){ reportPeriod=p; ['today','week','month'].forEach(x=>{ document.getElementById('rep-'+x).className='flex-1 bg-white border font-bold py-2.5 rounded-xl text-sm'; }); document.getElementById('rep-'+p).className='flex-1 bg-slate-900 text-white font-bold py-2.5 rounded-xl text-sm'; render(); }
+function getReportSales(){ const now=Date.now(); let cutoff=now; if(reportPeriod==='today') cutoff=now-24*60*60*1000; if(reportPeriod==='week') cutoff=now-7*24*60*60*1000; if(reportPeriod==='month') cutoff=now-30*24*60*60*1000; return sales.filter(s=>(s.ts||now)>=cutoff); }
+
+function productCard(p){ const th=getThreshold(); const isLow=p.qty<th; return `<div class="card bg-white p-4 rounded-[20px] border ${isLow?'border-red-200':'border-slate-100'} flex justify-between items-center gap-3"><div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-11 h-11 ${isLow?'bg-red-100':'bg-blue-100'} rounded-xl flex items-center justify-center shrink-0">${isLow?'⚠️':'📦'}</div><div class="min-w-0 flex-1"><p class="font-bold truncate">${p.name} ${p.barcode?`<span class="text-[11px] text-slate-400 font-normal">#${p.barcode}</span>`:''}</p><p class="text-[13px] text-slate-500 truncate">R ${p.price.toFixed(2)} • ${isLow?'<span class="text-red-500 font-bold">Low Stock - Restock!</span>':p.qty+' in stock'}</p><div class="w-28 h-1.5 bg-slate-100 rounded-full mt-2 overflow-hidden"><div class="h-full ${isLow?'bg-red-500':'bg-emerald-500'}" style="width:${Math.min(100,p.qty*10)}%"></div></div></div></div><div class="flex items-center gap-1.5 shrink-0">${user.role==='Viewer'?`<span class="font-black bg-slate-100 px-3 py-1.5 rounded-full text-sm">${p.qty}</span>`:`<button onclick="changeQty(${p.id},-1)" class="bg-slate-100 w-9 h-9 rounded-full font-black">-</button><span class="font-black w-7 text-center">${p.qty}</span><button onclick="changeQty(${p.id},1)" class="bg-slate-900 text-white w-9 h-9 rounded-full font-black">+</button><button onclick="sellOne(${p.id})" class="bg-emerald-600 text-white w-9 h-9 rounded-full">💰</button><button onclick="del(${p.id})" class="text-red-500 font-bold ml-1">🗑️</button>`}</div></div>`; }
+
 function render(){
-  const q=document.getElementById('search').value.toLowerCase();
-  const filtered=products.filter(p=>p.name.toLowerCase().includes(q));
-  document.getElementById('totalItems').textContent=products.length;
-  document.getElementById('totalQty').textContent=products.reduce((a,b)=>a+b.qty,0);
-  document.getElementById('lowStock').textContent=products.filter(p=>p.qty<5).length;
-  document.getElementById('list').innerHTML = filtered.length? '' : '<div class="bg-white rounded-[24px] p-8 text-center border border-dashed border-slate-200"><div class="text-4xl mb-2">📦</div><p class="font-bold text-sm">No products yet</p><p class="text-slate-400 text-xs mt-1">Add your first product above to get started.</p></div>';
-  filtered.forEach(p=>{
-    const isLow = p.qty < 5;
-    const div=document.createElement('div');
-    div.className='bg-white p-4 rounded-[20px] shadow-sm border ' + (isLow ? 'border-red-200' : 'border-slate-100') + ' flex justify-between items-center';
-    div.innerHTML=`
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 ${isLow ? 'bg-red-100' : 'bg-blue-100'} rounded-xl flex items-center justify-center text-lg shrink-0">${isLow ? '⚠️' : '📦'}</div>
-        <div>
-          <p class="font-bold text-[15px] leading-tight">${p.name}</p>
-          <p class="text-[13px] text-slate-500 mt-0.5">R ${p.price.toFixed(2)} • ${isLow ? '<span class="text-red-500 font-bold">Low Stock - Restock!</span>' : p.qty+' in stock'}</p>
-          <div class="w-28 h-1.5 bg-slate-100 rounded-full mt-2 overflow-hidden"><div class="h-full rounded-full ${isLow ? 'bg-red-500' : 'bg-emerald-500'}" style="width:${Math.min(100, p.qty*10)}%"></div></div>
-        </div>
-      </div>
-      <div class="flex items-center gap-1.5 shrink-0">
-        ${user.role==='Admin'?`<button onclick="changeQty(${p.id},-1)" class="bg-slate-100 hover:bg-slate-200 w-9 h-9 rounded-full font-black">-</button><span class="font-black w-7 text-center">${p.qty}</span><button onclick="changeQty(${p.id},1)" class="bg-slate-900 text-white w-9 h-9 rounded-full font-black">+</button><button onclick="del(${p.id})" class="text-red-500 font-bold ml-1 text-lg">🗑️</button>`:`<span class="font-black bg-slate-100 px-3 py-1.5 rounded-full text-sm">${p.qty}</span>`}
-      </div>`;
-    document.getElementById('list').appendChild(div);
-  });
+  const th=getThreshold(); const q=(document.getElementById('search').value||'').toLowerCase(); const filtered=products.filter(p=>p.name.toLowerCase().includes(q)); const lowFiltered=products.filter(p=>p.qty<th);
+  document.getElementById('totalItems').textContent=products.length; document.getElementById('totalQty').textContent=products.reduce((a,b)=>a+b.qty,0); document.getElementById('lowStock').textContent=lowFiltered.length;
+  const totalSales=sales.reduce((a,b)=>a+b.total,0); document.getElementById('dashSalesTotal').textContent=`R ${totalSales.toFixed(2)}`; document.getElementById('dashSalesCount').textContent=`${sales.length} sales`; document.getElementById('salesTotal').textContent=`R ${totalSales.toFixed(2)}`; document.getElementById('salesCount').textContent=sales.length;
+  const empty='<div class="card bg-white rounded-[24px] p-8 text-center border border-dashed"><p class="font-bold">No products yet</p><p class="text-slate-400 text-xs">Add your first product above.</p></div>';
+  document.getElementById('list').innerHTML=filtered.length?filtered.map(productCard).join(''):empty;
+  document.getElementById('list-products').innerHTML=products.length?products.map(productCard).join(''):empty;
+  document.getElementById('list-low').innerHTML=lowFiltered.length?lowFiltered.map(productCard).join(''):'<div class="bg-emerald-50 border border-emerald-200 rounded-[24px] p-8 text-center"><p class="font-bold">✅ All good!</p><p class="text-slate-500 text-xs">No low stock items.</p></div>';
+  // Low alert
+  if(settings.alert!==false && lowFiltered.length>0 && currentView==='dashboard'){ document.getElementById('lowAlert').classList.remove('hidden'); document.getElementById('lowAlertText').textContent=`⚠️ ${lowFiltered.length} item(s) low! ${lowFiltered.map(p=>p.name).join(', ')}`; try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); o.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.15); }catch(e){} } else { document.getElementById('lowAlert').classList.add('hidden'); }
+  // Sales dropdown
+  const sel=document.getElementById('saleProduct'); const cv=sel.value; sel.innerHTML=products.length?products.map(p=>`<option value="${p.id}">${p.name} - R ${p.price.toFixed(2)} (${p.qty} left)</option>`).join(''):'<option value="">No products yet</option>'; if(cv) sel.value=cv;
+  document.getElementById('list-sales').innerHTML=sales.length?sales.map(s=>`<div class="card bg-white p-4 rounded-2xl border flex justify-between gap-3"><div><p class="font-bold text-sm">${s.name}</p><p class="text-xs text-slate-400">${s.date} • ${s.qty} x R ${s.price.toFixed(2)}</p></div><span class="font-black text-emerald-600 shrink-0">R ${s.total.toFixed(2)}</span></div>`).join(''):'<div class="card bg-white rounded-[24px] p-8 text-center border border-dashed"><p class="font-bold">No sales yet</p></div>';
+  // Report
+  const rep=getReportSales(); const repTotal=rep.reduce((a,b)=>a+b.total,0); document.getElementById('repTotal').textContent=`R ${repTotal.toFixed(2)}`; document.getElementById('repCount').textContent=`${rep.length} sales in this period`;
+  const counts={}; rep.forEach(s=>counts[s.name]=(counts[s.name]||0)+s.qty); const best=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]; document.getElementById('repBest').textContent=best?`${best[0]} - ${best[1]} sold`:'No sales yet';
+  document.getElementById('list-report').innerHTML=rep.length?rep.map(s=>`<div class="card bg-white p-4 rounded-2xl border flex justify-between"><div><p class="font-bold text-sm">${s.name}</p><p class="text-xs text-slate-400">${s.date}</p></div><span class="font-black text-emerald-600">R ${s.total.toFixed(2)}</span></div>`).join(''):'<div class="card bg-white p-6 text-center border border-dashed">No sales in this period</div>';
+  // Staff list
+  document.getElementById('staffList').innerHTML=users.map((u,i)=>`<div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl"><span class="text-sm font-bold">${u.name} <span class="text-xs text-slate-400 font-normal">(${u.role} • ${u.pass})</span></span><button onclick="removeStaff(${i})" class="text-red-500 font-bold text-sm">Remove</button></div>`).join('');
+  document.getElementById('settingsShop').textContent = settings.shopName ? `Shop: ${settings.shopName}` : '';
 }
-function logout(){
-  sessionStorage.removeItem('stocksync_user');
-  sessionStorage.clear();
-  window.location.replace('index.html');
-}
+function logout(){ sessionStorage.removeItem('stocksync_user'); sessionStorage.clear(); window.location.replace('index.html'); }
 render();
 </script>
 </body>
