@@ -11,12 +11,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 <style>
 body{font-family:'Inter',sans-serif}
-.active-nav-glow{ box-shadow:0 0 20px rgba(99,102,241,0.2), inset 0 0 12px rgba(99,102,241,0.1); }
+.glass{ background:linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.12); backdrop-filter:blur(12px); }
+.glass-strong{ background:rgba(17,22,34,0.88); backdrop-filter:blur(20px); }
+.active-nav-glow{ box-shadow:0 0 20px rgba(99,102,241,0.25), inset 0 0 12px rgba(99,102,241,0.12); }
 #sidebar{transition:transform .3s ease} #overlay{transition:opacity .3s ease}
 .light-mode{ background:#f1f5f9 !important; color:#0f172a !important; }
-.light-mode .dark-card{ background:white !important; border-color:#e2e8f0 !important; color:#0f172a !important; }
+.light-mode .glass{ background:white !important; border-color:#e2e8f0 !important; color:#0f172a !important; }
+.light-mode .glass-strong{ background:rgba(255,255,255,0.95) !important; }
 .light-mode .dark-input{ background:#f8fafc !important; border-color:#e2e8f0 !important; color:#0f172a !important; }
-.light-mode .dark-text{ color:#64748b !important; }
 </style>
 <script>
 const saved = sessionStorage.getItem('stocksync_user');
@@ -27,21 +29,21 @@ history.pushState(null, null, location.href);
 window.onpopstate = function(){ history.pushState(null, null, location.href); };
 </script>
 </head>
-<body id="body" class="bg-[#0B0F17] text-slate-100 font-sans antialiased">
+<body id="body" class="bg-[#0B0F17] text-slate-100 min-h-screen">
 
 <div id="overlay" onclick="toggleMenu(false)" class="fixed inset-0 bg-black/60 z-40 opacity-0 pointer-events-none"></div>
 
-<!-- ===== YOUR NEW SIDEBAR - FIXED, NOW WORKS ===== -->
-<aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#111622]/85 backdrop-blur-xl border-r border-slate-800/80 flex flex-col justify-between p-5 -translate-x-full">
+<!-- ===== SIDEBAR - EXACTLY LIKE PHOTO 1 ===== -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 glass-strong border-r border-slate-800/80 flex flex-col justify-between p-5 -translate-x-full">
   <div>
     <div class="flex items-center justify-between mb-8 px-1">
       <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2"><img src="logo.png" class="w-8 h-8 rounded-lg object-cover bg-white p-0.5" onerror="this.style.display='none'">StockSync</h1>
-      <button onclick="toggleMenu(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60"><i data-lucide="x" class="w-5 h-5"></i></button>
+      <button onclick="toggleMenu(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
     <nav class="space-y-2">
       <button id="nav-dashboard" onclick="showView('dashboard')" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl bg-slate-800/50 border border-indigo-500/40 text-white font-medium active-nav-glow"><i data-lucide="layout-grid" class="w-5 h-5 text-indigo-400"></i><span>Dashboard</span></button>
       <button id="nav-products" onclick="showView('products')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40"><i data-lucide="package" class="w-5 h-5 text-slate-400"></i><span>Products</span></button>
-      <button id="nav-low" onclick="showView('low')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40"><i data-lucide="alert-triangle" class="w-5 h-5 text-slate-400"></i><span>Low Stock</span></button>
+      <button id="nav-low" onclick="showView('low')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40"><i data-lucide="trending-down" class="w-5 h-5 text-slate-400"></i><span>Low Stock</span></button>
       <button id="nav-sales" onclick="showView('sales')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40"><i data-lucide="badge-dollar-sign" class="w-5 h-5 text-slate-400"></i><span>Sales</span></button>
       <button id="nav-report" onclick="showView('report')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40"><i data-lucide="bar-chart-2" class="w-5 h-5 text-slate-400"></i><span>Sales Report</span></button>
       <button id="nav-settings" onclick="showView('settings')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40"><i data-lucide="settings" class="w-5 h-5 text-slate-400"></i><span>Settings</span></button>
@@ -49,52 +51,65 @@ window.onpopstate = function(){ history.pushState(null, null, location.href); };
     </nav>
   </div>
   <div class="bg-[#161C2C]/90 border border-slate-800/90 rounded-2xl p-4 text-center shadow-lg">
-    <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center overflow-hidden"><i data-lucide="user" class="w-7 h-7 text-slate-400"></i></div>
+    <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center overflow-hidden">
+      <img src="profile.jpg" class="w-full h-full object-cover" onerror="this.style.display='none';document.getElementById('avatarFallback').style.display='flex'">
+      <span id="avatarFallback" class="hidden w-full h-full items-center justify-center text-xl font-black bg-indigo-600 text-white">M</span>
+    </div>
     <h2 class="text-base font-semibold text-white leading-snug"><span id="sidebarName">Mthokozisi</span><br><span id="sidebarRole" class="text-sm font-medium text-slate-300">(Admin)</span></h2>
     <div class="mt-2.5 flex items-center justify-center gap-1.5 text-xs text-slate-400"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span id="syncStatus">Last sync: Never</span></div>
   </div>
 </aside>
 
-<!-- ===== MAIN CONTENT - YOUR DASHBOARD ===== -->
-<div class="w-full max-w-md mx-auto flex-1 flex flex-col pb-24">
-  <header class="flex items-center justify-between px-5 py-4 border-b border-slate-800/80">
-    <button onclick="toggleMenu(true)" class="text-slate-300 hover:text-white text-2xl">☰</button>
+<!-- ===== MAIN - EXACTLY LIKE PHOTO 2 ===== -->
+<div class="w-full max-w-md mx-auto flex-1 flex flex-col pb-28">
+  <header class="flex items-center justify-between px-5 py-4">
+    <button onclick="toggleMenu(true)" class="text-slate-300 text-2xl">☰</button>
     <span class="text-lg font-semibold tracking-tight text-white flex items-center gap-2"><img src="logo.png" class="w-7 h-7 rounded-lg object-cover bg-white p-0.5" onerror="this.style.display='none'">StockSync</span>
     <span class="w-6"></span>
   </header>
 
-  <div class="flex items-center justify-between px-5 py-4">
+  <div class="flex items-center justify-between px-5 py-2">
     <p class="text-sm text-slate-300">Hi <span id="hiName" class="font-medium text-white">Mthokozisi</span> <span class="mx-1 text-slate-500">•</span> <span id="hiRole" class="text-slate-400">Admin</span></p>
-    <div class="inline-flex items-center bg-[#182028] border border-slate-700/60 rounded-full p-0.5 text-xs">
-      <button onclick="toggleDark()" id="darkBtn" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#232d38] text-slate-200 font-medium">🌙 Dark</button>
-      <button onclick="logout()" class="px-3 py-1 text-slate-400 hover:text-white">Logout</button>
+    <div class="inline-flex items-center glass rounded-full p-0.5 text-xs">
+      <button onclick="toggleDark()" id="darkBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#232d38] text-slate-200 font-medium">🌙 Dark</button>
+      <button onclick="logout()" class="px-3 py-1.5 text-slate-400 hover:text-white">Logout</button>
     </div>
   </div>
 
-  <div id="lowAlert" class="hidden mx-5 mb-4 bg-red-500 text-white p-4 rounded-2xl flex justify-between items-center"><span id="lowAlertText" class="font-bold text-sm"></span><button onclick="document.getElementById('lowAlert').classList.add('hidden')" class="font-black">×</button></div>
+  <div id="lowAlert" class="hidden mx-5 mt-3 bg-red-500 text-white p-4 rounded-2xl flex justify-between items-center"><span id="lowAlertText" class="font-bold text-sm"></span><button onclick="document.getElementById('lowAlert').classList.add('hidden')" class="font-black">×</button></div>
 
-  <main class="px-5 space-y-4">
+  <main class="px-5 space-y-4 mt-3">
     <div id="view-dashboard" class="space-y-4">
-      <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#231d35] via-[#1a1c29] to-[#131922] border border-indigo-500/20 p-5 shadow-lg"><span class="text-[11px] font-semibold tracking-wider uppercase text-indigo-300/80">Today's Overview</span><h1 class="mt-1.5 text-2xl font-semibold text-white">Your shop at a glance 👀</h1><p class="mt-1 text-sm text-slate-400">Keep track, sell more, stress less.</p><div class="absolute -top-12 -right-12 w-36 h-36 bg-indigo-500/10 rounded-full blur-2xl"></div></section>
+      <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#231d35] via-[#1a1c29] to-[#131922] border border-indigo-500/20 p-5 shadow-lg">
+        <span class="text-[11px] font-semibold tracking-wider uppercase text-indigo-300/80">Today's Overview</span>
+        <h1 class="mt-1.5 text-2xl font-semibold text-white flex items-center gap-2">Your shop at a glance <span class="text-xl">👁️</span></h1>
+        <p class="mt-1 text-sm text-slate-400">Keep track, sell more, stress less.</p>
+        <div class="absolute -top-12 -right-12 w-36 h-36 bg-indigo-500/10 rounded-full blur-2xl"></div>
+      </section>
+
       <section class="grid grid-cols-3 gap-3">
-        <div class="dark-card bg-[#151c24] border border-slate-800/90 rounded-2xl p-3.5"><div class="w-8 h-8 rounded-lg bg-slate-800/60 flex items-center justify-center mb-3">📦</div><p class="text-xs text-slate-400 dark-text">Total Items</p><p id="totalItems" class="mt-0.5 text-xl font-bold text-white">0</p></div>
-        <div class="dark-card bg-[#151c24] border border-slate-800/90 rounded-2xl p-3.5"><div class="w-8 h-8 rounded-lg bg-slate-800/60 flex items-center justify-center mb-3">🔢</div><p class="text-xs text-slate-400 dark-text">Total Qty</p><p id="totalQty" class="mt-0.5 text-xl font-bold text-white">0</p></div>
-        <div class="dark-card bg-[#151c24] border border-slate-800/90 rounded-2xl p-3.5"><div class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400 mb-3">⚠️</div><p class="text-xs text-slate-400 dark-text">Low Stock</p><p id="lowStock" class="mt-0.5 text-xl font-bold text-red-500">0</p></div>
+        <div class="glass rounded-2xl p-3.5"><div class="text-2xl mb-2">📦</div><p class="text-xs text-slate-300">Total Items</p><p id="totalItems" class="mt-0.5 text-xl font-bold text-white">0</p></div>
+        <div class="glass rounded-2xl p-3.5"><div class="text-2xl mb-2">🔢</div><p class="text-xs text-slate-300">Total Qty</p><p id="totalQty" class="mt-0.5 text-xl font-bold text-white">0</p></div>
+        <div class="glass rounded-2xl p-3.5"><div class="text-2xl mb-2">⚠️</div><p class="text-xs text-slate-300">Low Stock</p><p id="lowStock" class="mt-0.5 text-xl font-bold text-red-500">0</p></div>
       </section>
+
       <section class="grid grid-cols-2 gap-3">
-        <div class="bg-gradient-to-br from-[#122b22] to-[#141c24] border border-emerald-500/20 rounded-2xl p-4"><p id="dashSalesTotal" class="text-2xl font-bold text-white">R 0.00</p><p class="mt-1 text-xs text-emerald-300/80">Total Sales</p></div>
-        <div class="dark-card bg-[#151c24] border border-slate-800/90 rounded-2xl p-4"><p id="dashSalesCount" class="text-2xl font-bold text-white">0 sales</p><p class="mt-1 text-xs text-slate-400 dark-text">Sales</p></div>
+        <div class="rounded-2xl p-4 bg-gradient-to-br from-[#122b22] to-[#141c24] border border-emerald-500/20"><p id="dashSalesTotal" class="text-2xl font-bold text-white">R 0.00</p><p class="mt-1 text-xs text-emerald-300/80">Total Sales</p></div>
+        <div class="glass rounded-2xl p-4"><p id="dashSalesCount" class="text-2xl font-bold text-white">0 sales</p><p class="mt-1 text-xs text-slate-400">Sales</p></div>
       </section>
-      <section class="relative"><span class="absolute left-3.5 top-3.5 text-slate-400">🔍</span><input id="search" oninput="render()" type="text" placeholder="Search product... e.g. Coke" class="dark-input w-full bg-[#151c24] border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-slate-500 outline-none"></section>
-      <section id="adminBox" class="dark-card bg-[#151c24] border border-slate-800/90 rounded-2xl p-4 space-y-3.5">
-        <div class="flex items-center justify-between"><h2 class="text-base font-semibold text-white">+ Add New Product</h2><span class="text-xs font-medium text-slate-400 bg-slate-800/70 px-2.5 py-1 rounded-md">Admin Only</span></div>
-        <input id="pName" type="text" placeholder="Product name - e.g. Coca-Cola 500ml" class="dark-input w-full bg-[#0f141a] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none">
-        <div class="grid grid-cols-2 gap-3"><input id="pQty" type="number" placeholder="Qty" class="dark-input w-full bg-[#0f141a] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none"><input id="pPrice" type="number" step="0.01" placeholder="Price R" class="dark-input w-full bg-[#0f141a] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none"></div>
-        <div class="flex gap-3"><input id="pBarcode" placeholder="Barcode (optional)" class="dark-input flex-1 min-w-0 bg-[#0f141a] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none"><button onclick="scanBarcode()" type="button" class="bg-slate-800 px-4 rounded-xl text-sm font-bold shrink-0">📷 Scan</button></div>
-        <input id="barcodeInput" oninput="findByBarcode()" placeholder="🔍 Scan barcode to find / sell..." class="dark-input w-full bg-[#0f141a] border border-dashed border-indigo-500/50 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none">
+
+      <section class="relative"><span class="absolute left-3.5 top-3.5 text-slate-400">🔍</span><input id="search" oninput="render()" type="text" placeholder="Search product... e.g. Coke" class="dark-input w-full glass rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-slate-500 outline-none"></section>
+
+      <section id="adminBox" class="glass rounded-2xl p-4 space-y-3.5">
+        <div class="flex items-center justify-between"><h2 class="text-base font-semibold text-white">+ Add New Product</h2><span class="text-xs font-medium text-slate-400">Admin Only</span></div>
+        <input id="pName" type="text" placeholder="Product name - e.g. Coca-Cola 500ml" class="dark-input w-full bg-[#0f141a]/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none">
+        <div class="grid grid-cols-2 gap-3"><input id="pQty" type="number" placeholder="Qty" class="dark-input w-full bg-[#0f141a]/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none"><input id="pPrice" type="number" step="0.01" placeholder="Price R" class="dark-input w-full bg-[#0f141a]/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none"></div>
+        <div class="flex gap-3"><input id="pBarcode" placeholder="Barcode (optional)" class="dark-input flex-1 min-w-0 bg-[#0f141a]/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none"><button onclick="scanBarcode()" type="button" class="bg-slate-800 px-4 rounded-xl text-sm font-bold shrink-0">📷 Scan</button></div>
+        <input id="barcodeInput" oninput="findByBarcode()" placeholder="🔍 Scan barcode to find / sell..." class="dark-input w-full bg-[#0f141a]/60 border border-dashed border-indigo-500/50 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none">
         <p id="barcodeMsg" class="text-xs text-slate-400">Type barcode to find product.</p>
         <button onclick="addProduct()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm py-2.5 rounded-xl">Save Product</button>
       </section>
+
       <div id="viewerMsg" class="hidden bg-amber-500/10 border border-amber-500/30 text-amber-300 p-4 rounded-2xl text-sm">👀 You are a Viewer — you can only view stock.</div>
       <div class="flex justify-between items-center px-1"><h3 class="font-bold">Your Products</h3><span class="text-xs text-slate-400">Tap + / - • 💰 to sell</span></div>
       <div id="list" class="space-y-3"></div>
@@ -104,36 +119,37 @@ window.onpopstate = function(){ history.pushState(null, null, location.href); };
     <div id="view-low" class="hidden space-y-3"><h2 class="text-2xl font-bold">📉 Low Stock</h2><p class="text-slate-400 text-sm">Below <span id="lowLabel" class="font-bold text-red-500">5</span> items.</p><div id="list-low" class="space-y-3"></div></div>
     <div id="view-sales" class="hidden space-y-3">
       <h2 class="text-2xl font-bold">💰 Sales</h2>
-      <div class="grid grid-cols-2 gap-3"><div class="bg-emerald-600/20 border border-emerald-500/30 p-4 rounded-2xl"><p id="salesTotal" class="text-xl font-black">R 0.00</p><p class="text-xs text-emerald-300">Total Made</p></div><div class="dark-card bg-[#151c24] border p-4 rounded-2xl"><p id="salesCount" class="text-xl font-black">0</p><p class="text-xs text-slate-400">Total Sales</p></div></div>
-      <div class="dark-card bg-[#151c24] border border-slate-800 rounded-2xl p-4 space-y-3"><h3 class="font-bold">🧾 Make a Sale</h3><select id="saleProduct" class="dark-input w-full bg-[#0f141a] border border-slate-800 rounded-xl p-3 text-sm"></select><div class="flex gap-3"><input id="saleQty" type="number" value="1" min="1" class="dark-input flex-1 bg-[#0f141a] border border-slate-800 rounded-xl p-3"><button onclick="makeSale()" class="flex-1 bg-emerald-600 font-bold rounded-xl text-sm">Sell Now 💰</button></div><p id="saleMsg" class="text-xs text-slate-400">Stock goes down automatically.</p></div>
+      <div class="grid grid-cols-2 gap-3"><div class="bg-emerald-600/20 border border-emerald-500/30 p-4 rounded-2xl"><p id="salesTotal" class="text-xl font-black">R 0.00</p><p class="text-xs text-emerald-300">Total Made</p></div><div class="glass p-4 rounded-2xl"><p id="salesCount" class="text-xl font-black">0</p><p class="text-xs text-slate-400">Total Sales</p></div></div>
+      <div class="glass rounded-2xl p-4 space-y-3"><h3 class="font-bold">🧾 Make a Sale</h3><select id="saleProduct" class="dark-input w-full bg-[#0f141a] border border-white/10 rounded-xl p-3 text-sm"></select><div class="flex gap-3"><input id="saleQty" type="number" value="1" min="1" class="dark-input flex-1 bg-[#0f141a] border border-white/10 rounded-xl p-3"><button onclick="makeSale()" class="flex-1 bg-emerald-600 font-bold rounded-xl text-sm">Sell Now 💰</button></div><p id="saleMsg" class="text-xs text-slate-400">Stock goes down automatically.</p></div>
       <div id="list-sales" class="space-y-3"></div>
       <button onclick="clearSales()" class="w-full bg-red-500/10 text-red-400 font-bold py-3 rounded-xl text-sm">Clear Sales History</button>
     </div>
     <div id="view-report" class="hidden space-y-3">
       <h2 class="text-2xl font-bold">📊 Sales Report</h2>
-      <div class="flex gap-2"><button onclick="setReport('today')" id="rep-today" class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-sm">Today</button><button onclick="setReport('week')" id="rep-week" class="flex-1 bg-[#151c24] border border-slate-800 font-bold py-2.5 rounded-xl text-sm">Week</button><button onclick="setReport('month')" id="rep-month" class="flex-1 bg-[#151c24] border border-slate-800 font-bold py-2.5 rounded-xl text-sm">Month</button></div>
-      <div class="dark-card bg-[#151c24] border border-slate-800 p-5 rounded-2xl"><p class="text-sm text-slate-400">Revenue</p><p id="repTotal" class="text-3xl font-black">R 0.00</p><p id="repCount" class="text-sm text-slate-400">0 sales</p><p class="font-bold mt-4">🏆 Best Seller:</p><p id="repBest" class="text-emerald-400 font-bold">No sales yet</p></div>
+      <div class="flex gap-2"><button onclick="setReport('today')" id="rep-today" class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-sm">Today</button><button onclick="setReport('week')" id="rep-week" class="flex-1 glass font-bold py-2.5 rounded-xl text-sm">Week</button><button onclick="setReport('month')" id="rep-month" class="flex-1 glass font-bold py-2.5 rounded-xl text-sm">Month</button></div>
+      <div class="glass p-5 rounded-2xl"><p class="text-sm text-slate-400">Revenue</p><p id="repTotal" class="text-3xl font-black">R 0.00</p><p id="repCount" class="text-sm text-slate-400">0 sales</p><p class="font-bold mt-4">🏆 Best Seller:</p><p id="repBest" class="text-emerald-400 font-bold">No sales yet</p></div>
       <div id="list-report" class="space-y-3"></div>
     </div>
     <div id="view-settings" class="hidden space-y-3">
       <h2 class="text-2xl font-bold">⚙️ Settings</h2>
-      <div class="dark-card bg-[#151c24] border border-slate-800 rounded-2xl p-4 space-y-6">
+      <div class="glass rounded-2xl p-4 space-y-6">
         <div><p class="font-bold">👤 Logged in as</p><p id="settingsUser" class="text-slate-400 text-sm"></p><p id="settingsShop" class="text-xs text-slate-500"></p></div>
-        <div class="border-t border-slate-800 pt-5"><p class="font-bold">🔑 Change Password</p><select id="passRole" class="dark-input w-full bg-[#0f141a] border border-slate-800 rounded-xl p-3 mt-2 text-sm"><option>Admin</option><option>Viewer</option><option>Cashier</option></select><input id="newPass" placeholder="New password" class="dark-input w-full bg-[#0f141a] border border-slate-800 rounded-xl p-3 mt-2 text-sm"><button onclick="changePassword()" class="mt-2 bg-indigo-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Save New Password</button></div>
-        <div class="border-t border-slate-800 pt-5"><p class="font-bold">👥 Staff - Add / Remove</p><input id="staffName" placeholder="Staff name - e.g. Lerato" class="dark-input w-full bg-[#0f141a] border border-slate-800 rounded-xl p-3 mt-2 text-sm"><div class="flex gap-2 mt-2"><select id="staffRole" class="dark-input flex-1 bg-[#0f141a] border border-slate-800 rounded-xl p-3 text-sm"><option>Cashier</option><option>Viewer</option><option>Admin</option></select><input id="staffPass" placeholder="Password" class="dark-input flex-1 bg-[#0f141a] border border-slate-800 rounded-xl p-3 text-sm"></div><button onclick="addStaff()" class="mt-2 bg-blue-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">+ Add Staff</button><div id="staffList" class="mt-3 space-y-2"></div></div>
-        <div class="border-t border-slate-800 pt-5"><p class="font-bold">🏪 Shop Name</p><input id="shopName" class="dark-input w-full bg-[#0f141a] border border-slate-800 rounded-xl p-3 mt-2 text-sm"><button onclick="saveShopName()" class="mt-2 bg-indigo-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Save Shop Name</button></div>
-        <div><p class="font-bold">⚠️ Low Stock Alert At</p><div class="flex gap-2 mt-2"><input id="lowThreshold" type="number" class="dark-input flex-1 bg-[#0f141a] border border-slate-800 rounded-xl p-3 text-sm"><button onclick="saveThreshold()" class="bg-blue-600 text-white font-bold text-sm px-4 rounded-xl">Save</button></div><label class="flex gap-2 mt-3 text-sm"><input id="alertToggle" type="checkbox" checked onchange="saveAlertToggle()"> Show Low Stock popup + sound</label></div>
-        <div class="border-t border-slate-800 pt-5"><p class="font-bold">🌙 Appearance</p><button onclick="toggleDark()" class="mt-2 bg-slate-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Toggle Dark / Light</button><p class="text-xs text-slate-400 mt-1">Current: <span id="modeLabel">Dark</span></p></div>
-        <div class="border-t border-slate-800 pt-5"><p class="font-bold">📷 Barcode Scanner</p><button onclick="scanBarcode()" class="mt-2 bg-slate-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl">📷 Open Camera Scanner</button><p id="barcodeStatus" class="text-xs mt-1 text-slate-400"></p></div>
-        <div class="border-t border-slate-800 pt-5"><p class="font-bold">💾 Backup / Export</p><button onclick="exportCSV()" class="w-full mt-2 bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm">📊 Export to Excel (CSV)</button><button onclick="backupJSON()" class="w-full mt-2 bg-slate-800 text-white font-bold py-3 rounded-xl text-sm">☁️ Download Full Backup</button><label class="block mt-3 text-sm font-bold">Restore Backup:</label><input type="file" id="restoreFile" accept=".json" onchange="restoreJSON(event)" class="w-full text-sm mt-1"></div>
-        <div class="border-t border-slate-800 pt-5"><p class="font-bold">☁️ Cloud Sync</p><button onclick="cloudSync()" class="mt-2 bg-blue-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Sync Now</button><p id="cloudMsg" class="text-xs text-emerald-400 font-bold mt-1"></p></div>
-        <div class="border-t border-slate-800 pt-5"><p class="font-bold text-red-400">Danger Zone</p><button onclick="clearAllProducts()" class="w-full mt-3 bg-red-500/10 text-red-400 font-bold py-3 rounded-xl text-sm">🗑️ Delete All Products</button><button onclick="clearAllData()" class="w-full mt-2 bg-red-600 text-white font-bold py-3 rounded-xl text-sm">Reset Everything</button></div>
+        <div class="border-t border-white/10 pt-5"><p class="font-bold">🔑 Change Password</p><select id="passRole" class="dark-input w-full bg-[#0f141a] border border-white/10 rounded-xl p-3 mt-2 text-sm"><option>Admin</option><option>Viewer</option><option>Cashier</option></select><input id="newPass" placeholder="New password" class="dark-input w-full bg-[#0f141a] border border-white/10 rounded-xl p-3 mt-2 text-sm"><button onclick="changePassword()" class="mt-2 bg-indigo-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Save New Password</button></div>
+        <div class="border-t border-white/10 pt-5"><p class="font-bold">👥 Staff - Add / Remove</p><input id="staffName" placeholder="Staff name - e.g. Lerato" class="dark-input w-full bg-[#0f141a] border border-white/10 rounded-xl p-3 mt-2 text-sm"><div class="flex gap-2 mt-2"><select id="staffRole" class="dark-input flex-1 bg-[#0f141a] border border-white/10 rounded-xl p-3 text-sm"><option>Cashier</option><option>Viewer</option><option>Admin</option></select><input id="staffPass" placeholder="Password" class="dark-input flex-1 bg-[#0f141a] border border-white/10 rounded-xl p-3 text-sm"></div><button onclick="addStaff()" class="mt-2 bg-blue-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">+ Add Staff</button><div id="staffList" class="mt-3 space-y-2"></div></div>
+        <div class="border-t border-white/10 pt-5"><p class="font-bold">🏪 Shop Name</p><input id="shopName" class="dark-input w-full bg-[#0f141a] border border-white/10 rounded-xl p-3 mt-2 text-sm"><button onclick="saveShopName()" class="mt-2 bg-indigo-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Save Shop Name</button></div>
+        <div><p class="font-bold">⚠️ Low Stock Alert At</p><div class="flex gap-2 mt-2"><input id="lowThreshold" type="number" class="dark-input flex-1 bg-[#0f141a] border border-white/10 rounded-xl p-3 text-sm"><button onclick="saveThreshold()" class="bg-blue-600 text-white font-bold text-sm px-4 rounded-xl">Save</button></div><label class="flex gap-2 mt-3 text-sm"><input id="alertToggle" type="checkbox" checked onchange="saveAlertToggle()"> Show Low Stock popup + sound</label></div>
+        <div class="border-t border-white/10 pt-5"><p class="font-bold">🌙 Appearance</p><button onclick="toggleDark()" class="mt-2 bg-slate-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Toggle Dark / Light</button><p class="text-xs text-slate-400 mt-1">Current: <span id="modeLabel">Dark</span></p></div>
+        <div class="border-t border-white/10 pt-5"><p class="font-bold">📷 Barcode Scanner</p><button onclick="scanBarcode()" class="mt-2 bg-slate-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl">📷 Open Camera Scanner</button><p id="barcodeStatus" class="text-xs mt-1 text-slate-400"></p></div>
+        <div class="border-t border-white/10 pt-5"><p class="font-bold">💾 Backup / Export</p><button onclick="exportCSV()" class="w-full mt-2 bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm">📊 Export to Excel (CSV)</button><button onclick="backupJSON()" class="w-full mt-2 bg-slate-800 text-white font-bold py-3 rounded-xl text-sm">☁️ Download Full Backup</button><label class="block mt-3 text-sm font-bold">Restore Backup:</label><input type="file" id="restoreFile" accept=".json" onchange="restoreJSON(event)" class="w-full text-sm mt-1"></div>
+        <div class="border-t border-white/10 pt-5"><p class="font-bold">☁️ Cloud Sync</p><button onclick="cloudSync()" class="mt-2 bg-blue-600 text-white font-bold text-sm px-4 py-2.5 rounded-xl">Sync Now</button><p id="cloudMsg" class="text-xs text-emerald-400 font-bold mt-1"></p></div>
+        <div class="border-t border-white/10 pt-5"><p class="font-bold text-red-400">Danger Zone</p><button onclick="clearAllProducts()" class="w-full mt-3 bg-red-500/10 text-red-400 font-bold py-3 rounded-xl text-sm">🗑️ Delete All Products</button><button onclick="clearAllData()" class="w-full mt-2 bg-red-600 text-white font-bold py-3 rounded-xl text-sm">Reset Everything</button></div>
       </div>
     </div>
   </main>
 </div>
 
-<nav class="fixed bottom-0 inset-x-0 bg-[#121820]/95 backdrop-blur-md border-t border-slate-800/90 z-40"><div class="max-w-md mx-auto flex items-center justify-around py-3 px-6"><button onclick="showView('dashboard')" class="text-white p-2 rounded-lg bg-slate-800/60">🏠</button><button onclick="showView('products')" class="text-slate-400 p-2">📦</button><button onclick="showView('sales')" class="text-slate-400 p-2">💰</button><button onclick="showView('low')" class="text-slate-400 p-2">📉</button><button onclick="showView('settings')" class="text-slate-400 p-2">⚙️</button></div></nav>
+<!-- Bottom Nav - LIKE PHOTO 2 -->
+<nav class="fixed bottom-0 inset-x-0 bg-[#121820]/95 backdrop-blur-md border-t border-slate-800/90 z-40"><div class="max-w-md mx-auto flex items-center justify-around py-3 px-6"><button onclick="showView('dashboard')" class="text-white p-2">🏠</button><button onclick="showView('products')" class="text-slate-400 p-2">🔍</button><button onclick="showView('sales')" class="text-slate-400 p-2">⊞</button><button onclick="showView('settings')" class="text-slate-400 p-2">👤</button></div></nav>
 
 <div id="receiptModal" class="hidden fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4"><div class="bg-white text-slate-900 w-full max-w-sm rounded-[24px] p-6"><h3 class="font-black text-center">🧾 StockSync Receipt</h3><p id="receiptShop" class="text-center text-xs text-slate-400"></p><div class="border-t border-dashed my-3"></div><div id="receiptBody" class="text-sm space-y-1"></div><div class="border-t border-dashed my-3"></div><p id="receiptTotal" class="font-black text-right"></p><p class="text-center text-xs text-slate-400 mt-2">Thank you! 🙏</p><div class="flex gap-2 mt-4"><button onclick="shareReceipt()" class="flex-1 bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm">Share on WhatsApp</button><button onclick="closeReceipt()" class="flex-1 bg-slate-100 font-bold py-3 rounded-xl text-sm">Close</button></div></div></div>
 
@@ -146,6 +162,7 @@ let currentView='dashboard', reportPeriod='today', lastReceipt=null;
 document.getElementById('hiName').textContent = user.name; document.getElementById('hiRole').textContent = user.role;
 document.getElementById('sidebarName').textContent = user.name; document.getElementById('sidebarRole').textContent = `(${user.role})`;
 document.getElementById('settingsUser').textContent = `${user.name} (${user.role})`;
+document.getElementById('avatarFallback').textContent = user.name.charAt(0).toUpperCase();
 document.getElementById('shopName').value = settings.shopName || ''; document.getElementById('lowThreshold').value = settings.threshold || 5; document.getElementById('lowLabel').textContent = settings.threshold || 5; document.getElementById('alertToggle').checked = settings.alert !== false;
 if(settings.dark===false) applyDark(false); else applyDark(true);
 if(settings.lastSync) document.getElementById('syncStatus').textContent = 'Last sync: ' + settings.lastSync;
@@ -182,22 +199,22 @@ function exportCSV(){ let csv='Type,Name,Qty,Price,Total,Date\n'; products.forEa
 function backupJSON(){ const data={products, sales, settings, users, backedUpAt:new Date().toLocaleString()}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='stocksync-backup.json'; a.click(); alert('✅ Backup downloaded'); }
 function restoreJSON(e){ const file=e.target.files[0]; if(!file) return; const r=new FileReader(); r.onload=()=>{ try{ const d=JSON.parse(r.result); if(d.products) products=d.products; if(d.sales) sales=d.sales; if(d.settings) settings=d.settings; if(d.users) users=d.users; localStorage.setItem('stocksync_products',JSON.stringify(products)); localStorage.setItem('stocksync_sales',JSON.stringify(sales)); localStorage.setItem('stocksync_settings',JSON.stringify(settings)); localStorage.setItem('stocksync_users',JSON.stringify(users)); alert('✅ Restored!'); location.reload(); }catch(err){ alert('❌ Invalid file'); } }; r.readAsText(file); }
 function cloudSync(){ settings.lastSync=new Date().toLocaleString(); localStorage.setItem('stocksync_settings',JSON.stringify(settings)); document.getElementById('syncStatus').textContent='Last sync: '+settings.lastSync; document.getElementById('cloudMsg').textContent='✅ Synced at '+settings.lastSync; backupJSON(); }
-function setReport(p){ reportPeriod=p; ['today','week','month'].forEach(x=>{ document.getElementById('rep-'+x).className='flex-1 bg-[#151c24] border border-slate-800 font-bold py-2.5 rounded-xl text-sm'; }); document.getElementById('rep-'+p).className='flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-sm'; render(); }
+function setReport(p){ reportPeriod=p; ['today','week','month'].forEach(x=>{ document.getElementById('rep-'+x).className='flex-1 glass font-bold py-2.5 rounded-xl text-sm'; }); document.getElementById('rep-'+p).className='flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-sm'; render(); }
 function getReportSales(){ const now=Date.now(); let cutoff=now; if(reportPeriod==='today') cutoff=now-24*60*60*1000; if(reportPeriod==='week') cutoff=now-7*24*60*60*1000; if(reportPeriod==='month') cutoff=now-30*24*60*60*1000; return sales.filter(s=>(s.ts||now)>=cutoff); }
-function productCard(p){ const th=getThreshold(); const isLow=p.qty<th; return `<div class="dark-card bg-[#151c24] border ${isLow?'border-red-500/40':'border-slate-800'} rounded-2xl p-4 flex justify-between items-center gap-3"><div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-11 h-11 ${isLow?'bg-red-500/10 text-red-400':'bg-slate-800 text-slate-200'} rounded-xl flex items-center justify-center shrink-0">${isLow?'⚠️':'📦'}</div><div class="min-w-0 flex-1"><p class="font-bold text-white truncate">${p.name} ${p.barcode?`<span class="text-[11px] text-slate-400 font-normal">#${p.barcode}</span>`:''}</p><p class="text-[13px] text-slate-400 truncate">R ${p.price.toFixed(2)} • ${isLow?'<span class="text-red-400 font-bold">Low Stock - Restock!</span>':p.qty+' in stock'}</p><div class="w-28 h-1.5 bg-slate-800 rounded-full mt-2 overflow-hidden"><div class="h-full ${isLow?'bg-red-500':'bg-emerald-500'}" style="width:${Math.min(100,p.qty*10)}%"></div></div></div></div><div class="flex items-center gap-1.5 shrink-0">${user.role==='Viewer'?`<span class="font-black bg-slate-800 px-3 py-1.5 rounded-full text-sm">${p.qty}</span>`:`<button onclick="changeQty(${p.id},-1)" class="bg-slate-800 w-9 h-9 rounded-full font-black">-</button><span class="font-black w-7 text-center">${p.qty}</span><button onclick="changeQty(${p.id},1)" class="bg-white text-slate-900 w-9 h-9 rounded-full font-black">+</button><button onclick="sellOne(${p.id})" class="bg-emerald-600 text-white w-9 h-9 rounded-full">💰</button><button onclick="del(${p.id})" class="text-red-400 font-bold ml-1">🗑️</button>`}</div></div>`; }
+function productCard(p){ const th=getThreshold(); const isLow=p.qty<th; return `<div class="glass rounded-2xl p-4 flex justify-between items-center gap-3"><div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-11 h-11 bg-white/5 rounded-xl flex items-center justify-center shrink-0 text-lg">${isLow?'⚠️':'📦'}</div><div class="min-w-0 flex-1"><p class="font-bold text-white truncate">${p.name} ${p.barcode?`<span class="text-[11px] text-slate-400 font-normal">#${p.barcode}</span>`:''}</p><p class="text-[13px] text-slate-400 truncate">R ${p.price.toFixed(2)} • ${isLow?'<span class="text-red-400 font-bold">Low Stock - Restock!</span>':p.qty+' in stock'}</p><div class="w-28 h-1.5 bg-white/10 rounded-full mt-2 overflow-hidden"><div class="h-full ${isLow?'bg-red-500':'bg-emerald-500'}" style="width:${Math.min(100,p.qty*10)}%"></div></div></div></div><div class="flex items-center gap-1.5 shrink-0">${user.role==='Viewer'?`<span class="font-black bg-white/10 px-3 py-1.5 rounded-full text-sm">${p.qty}</span>`:`<button onclick="changeQty(${p.id},-1)" class="bg-white/10 w-9 h-9 rounded-full font-black">-</button><span class="font-black w-7 text-center">${p.qty}</span><button onclick="changeQty(${p.id},1)" class="bg-white text-slate-900 w-9 h-9 rounded-full font-black">+</button><button onclick="sellOne(${p.id})" class="bg-emerald-600 text-white w-9 h-9 rounded-full">💰</button><button onclick="del(${p.id})" class="text-red-400 font-bold ml-1">🗑️</button>`}</div></div>`; }
 function render(){
   const th=getThreshold(); const q=(document.getElementById('search').value||'').toLowerCase(); const filtered=products.filter(p=>p.name.toLowerCase().includes(q)); const lowFiltered=products.filter(p=>p.qty<th);
   document.getElementById('totalItems').textContent=products.length; document.getElementById('totalQty').textContent=products.reduce((a,b)=>a+b.qty,0); document.getElementById('lowStock').textContent=lowFiltered.length;
   const totalSales=sales.reduce((a,b)=>a+b.total,0); document.getElementById('dashSalesTotal').textContent=`R ${totalSales.toFixed(2)}`; document.getElementById('dashSalesCount').textContent=`${sales.length} sales`; document.getElementById('salesTotal').textContent=`R ${totalSales.toFixed(2)}`; document.getElementById('salesCount').textContent=sales.length;
-  const empty='<div class="dark-card bg-[#151c24] border border-dashed border-slate-800 rounded-2xl p-8 text-center"><p class="font-bold">No products yet</p><p class="text-slate-400 text-xs">Add your first product above.</p></div>';
+  const empty='<div class="glass rounded-2xl p-8 text-center"><p class="font-bold">No products yet</p><p class="text-slate-400 text-xs">Add your first product above.</p></div>';
   document.getElementById('list').innerHTML=filtered.length?filtered.map(productCard).join(''):empty;
   document.getElementById('list-products').innerHTML=products.length?products.map(productCard).join(''):empty;
   document.getElementById('list-low').innerHTML=lowFiltered.length?lowFiltered.map(productCard).join(''):'<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-8 text-center"><p class="font-bold">✅ All good!</p><p class="text-slate-400 text-xs">No low stock items.</p></div>';
   if(settings.alert!==false && lowFiltered.length>0 && currentView==='dashboard'){ document.getElementById('lowAlert').classList.remove('hidden'); document.getElementById('lowAlertText').textContent=`⚠️ ${lowFiltered.length} low! ${lowFiltered.map(p=>p.name).join(', ')}`; } else { document.getElementById('lowAlert').classList.add('hidden'); }
   const sel=document.getElementById('saleProduct'); const cv=sel.value; sel.innerHTML=products.length?products.map(p=>`<option value="${p.id}">${p.name} - R ${p.price.toFixed(2)} (${p.qty} left)</option>`).join(''):'<option value="">No products yet</option>'; if(cv) sel.value=cv;
-  document.getElementById('list-sales').innerHTML=sales.length?sales.map(s=>`<div class="dark-card bg-[#151c24] border border-slate-800 p-4 rounded-2xl flex justify-between gap-3"><div><p class="font-bold text-sm">${s.name}</p><p class="text-xs text-slate-400">${s.date} • ${s.qty} x R ${s.price.toFixed(2)}</p></div><span class="font-black text-emerald-400 shrink-0">R ${s.total.toFixed(2)}</span></div>`).join(''):'<div class="dark-card bg-[#151c24] border border-dashed p-8 text-center">No sales yet</div>';
-  const rep=getReportSales(); const repTotal=rep.reduce((a,b)=>a+b.total,0); document.getElementById('repTotal').textContent=`R ${repTotal.toFixed(2)}`; document.getElementById('repCount').textContent=`${rep.length} sales`; const counts={}; rep.forEach(s=>counts[s.name]=(counts[s.name]||0)+s.qty); const best=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]; document.getElementById('repBest').textContent=best?`${best[0]} - ${best[1]} sold`:'No sales yet'; document.getElementById('list-report').innerHTML=rep.length?rep.map(s=>`<div class="dark-card bg-[#151c24] border border-slate-800 p-4 rounded-2xl flex justify-between"><div><p class="font-bold text-sm">${s.name}</p><p class="text-xs text-slate-400">${s.date}</p></div><span class="font-black text-emerald-400">R ${s.total.toFixed(2)}</span></div>`).join(''):'<div class="dark-card p-6 text-center border border-dashed">No sales in this period</div>';
-  document.getElementById('staffList').innerHTML=users.map((u,i)=>`<div class="flex justify-between items-center bg-[#0f141a] p-3 rounded-xl"><span class="text-sm font-bold">${u.name} <span class="text-xs text-slate-400 font-normal">(${u.role} • ${u.pass})</span></span><button onclick="removeStaff(${i})" class="text-red-400 font-bold text-sm">Remove</button></div>`).join('');
+  document.getElementById('list-sales').innerHTML=sales.length?sales.map(s=>`<div class="glass p-4 rounded-2xl flex justify-between gap-3"><div><p class="font-bold text-sm">${s.name}</p><p class="text-xs text-slate-400">${s.date} • ${s.qty} x R ${s.price.toFixed(2)}</p></div><span class="font-black text-emerald-400 shrink-0">R ${s.total.toFixed(2)}</span></div>`).join(''):'<div class="glass p-8 text-center">No sales yet</div>';
+  const rep=getReportSales(); const repTotal=rep.reduce((a,b)=>a+b.total,0); document.getElementById('repTotal').textContent=`R ${repTotal.toFixed(2)}`; document.getElementById('repCount').textContent=`${rep.length} sales`; const counts={}; rep.forEach(s=>counts[s.name]=(counts[s.name]||0)+s.qty); const best=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]; document.getElementById('repBest').textContent=best?`${best[0]} - ${best[1]} sold`:'No sales yet'; document.getElementById('list-report').innerHTML=rep.length?rep.map(s=>`<div class="glass p-4 rounded-2xl flex justify-between"><div><p class="font-bold text-sm">${s.name}</p><p class="text-xs text-slate-400">${s.date}</p></div><span class="font-black text-emerald-400">R ${s.total.toFixed(2)}</span></div>`).join(''):'<div class="glass p-6 text-center">No sales in this period</div>';
+  document.getElementById('staffList').innerHTML=users.map((u,i)=>`<div class="flex justify-between items-center bg-black/20 p-3 rounded-xl"><span class="text-sm font-bold">${u.name} <span class="text-xs text-slate-400 font-normal">(${u.role} • ${u.pass})</span></span><button onclick="removeStaff(${i})" class="text-red-400 font-bold text-sm">Remove</button></div>`).join('');
   document.getElementById('settingsShop').textContent = settings.shopName ? `Shop: ${settings.shopName}` : '';
   if(window.lucide) lucide.createIcons();
 }
